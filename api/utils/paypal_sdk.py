@@ -1,0 +1,87 @@
+"""
+PayPal SDK utils
+"""
+import os
+import json
+
+from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment, LiveEnvironment
+from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest
+
+from api.models import User, Order
+from . import keys
+
+class PayPalSDK:
+    """
+    PayPal SDK class
+    """
+    def __init__(self):
+        self.sandbox = os.environ.get("PAYPAL_SANDBOX") == "true"
+        if self.sandbox:
+            self.client_id = os.environ.get("PAYPAL_SANDBOX_CLIENT_ID")
+            self.client_secret = os.environ.get("PAYPAL_SANDBOX_CLIENT_SECRET")
+            self.environment = SandboxEnvironment(
+                client_id=self.client_id, client_secret=self.client_secret
+            )
+        else:
+            self.client_id = os.environ.get("PAYPAL_CLIENT_ID")
+            self.client_secret = os.environ.get("PAYPAL_CLIENT_SECRET")
+            self.environment = LiveEnvironment(
+                client_id=self.client_id, client_secret=self.client_secret
+            )
+        self.client = PayPalHttpClient(self.environment)
+
+    def create_order(self):
+        """
+        Create a PayPal order
+        """
+        request = OrdersCreateRequest()
+        request.prefer("return=representation")
+        request.request_body(
+            {
+                "intent": "CAPTURE",
+                "application_context": {
+                    "return_url": "https://lightning-bot.com/paypal-return",
+                    "cancel_url": "https://lightning-bot.com/paypal-cancel",
+                    "shipping_preference": "NO_SHIPPING",
+                },
+                "purchase_units": [
+                    {
+                        "description": "LightningBot",
+                        "amount": {"currency_code": "EUR", "value": "5.00"},
+                    }
+                ],
+            }
+        )
+        response = self.client.execute(request)
+        return response.result.id
+
+    def capture_order(self, user: User, order_id: str):
+        """
+        Capture a PayPal order
+        """
+        request = OrdersCaptureRequest(order_id)
+        response = self.client.execute(request)
+        raw_json = json.dumps(response.raw_result, indent=4)
+        key_instance = None
+        if response.raw_result["status"] == "COMPLETED":
+            key_instance = keys.create_key(
+                user=user, create_reason=f"Purchase ({order_id})", created_by="API"
+            )
+            user.redeemed_key = key_instance
+            user.account_type = "Lifetime"
+            user.save()
+
+        response.raw_result["key"] = key_instance.key if key_instance else ""
+
+        Order.objects.create(
+            user=user,
+            status=response.raw_result["status"],
+            order_id=order_id,
+            key=response.raw_result["key"],
+            raw_json=raw_json,
+        )
+
+        return response.raw_result
+
+
+paypal_sdk = PayPalSDK()
