@@ -12,11 +12,12 @@ import os
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
-import api.urls
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lightningbot.settings")
 
 django_app = get_asgi_application()
+
+import api.urls
 
 application = ProtocolTypeRouter(
     {
