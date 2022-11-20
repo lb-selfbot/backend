@@ -164,3 +164,5 @@ EMAIL_HOST_USER = "password-reset@lightning-bot.com"
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+CSRF_TRUSTED_ORIGINS = ["https://api.lightning-bot.com"]
