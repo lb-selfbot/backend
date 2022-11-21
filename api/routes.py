@@ -4,9 +4,11 @@ Routes for the API
 import typing
 from enum import Flag, auto
 
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import path, resolvers
 
 from . import views
+from lightningbot import settings
 
 
 class RouteFlags(Flag):
@@ -50,6 +52,8 @@ class Route:
         """
         Get the Django path for this route
         """
+        if settings.DEBUG:
+            return path(self.route, csrf_exempt(self.view), name=self.name)
         return path(self.route, self.view, name=self.name)
 
 
