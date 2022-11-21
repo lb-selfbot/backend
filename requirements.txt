@@ -6,4 +6,4 @@ pycryptodome
 user-agents
 paypal-checkout-serversdk
 googlesearch-python
-dotenv
+python-dotenv
