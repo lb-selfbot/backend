@@ -66,21 +66,20 @@ class ApiMiddleware:
         if routes.RouteFlags.LOGIN_REQUIRED in api_route.flags:
             # Check if the user is logged in
             # if not, check if username and password are provided
-            if not request.user.is_authenticated and (
-                "username" not in request.POST or "password" not in request.POST
-            ):
-                return errors.login_required()
+            if not request.user.is_authenticated:
+                if "username" not in request.POST or "password" not in request.POST:
+                    return errors.login_required()
 
-            # Try to log in with username and password
-            username: str = request.POST.get("username")
-            password: str = request.POST.get("password")
+                # Try to log in with username and password
+                username: str = request.POST.get("username")
+                password: str = request.POST.get("password")
 
-            user = auth.authenticate(request, username=username, password=password)
+                user = auth.authenticate(request, username=username, password=password)
 
-            if user is None or not user.is_authenticated:
-                return errors.invalid_credentials()
+                if user is None or not user.is_authenticated:
+                    return errors.invalid_credentials()
 
-            request.user = user
+                request.user = user
 
         if routes.RouteFlags.ADMIN_REQUIRED in api_route.flags:
             if not request.user.is_staff:
