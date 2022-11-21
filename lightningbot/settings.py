@@ -168,4 +168,8 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = ["https://api.lightning-bot.com"]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
+    "https://api.lightning-bot.com",
+    "https://lightning-bot.com",
+    "http://localhost:3000",
+]
