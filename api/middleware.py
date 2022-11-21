@@ -66,7 +66,6 @@ class ApiMiddleware:
         if routes.RouteFlags.LOGIN_REQUIRED in api_route.flags:
             # Check if the user is logged in
             # if not, check if username and password are provided
-            print(request.user)
             if not request.user.is_authenticated:
                 if "username" not in request.POST or "password" not in request.POST:
                     return errors.login_required()
