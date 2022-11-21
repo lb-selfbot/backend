@@ -1,0 +1,9 @@
+django
+channels
+daphne
+django-cors-headers
+pycryptodome
+user-agents
+paypal-checkout-serversdk
+googlesearch-python
+dotenv
