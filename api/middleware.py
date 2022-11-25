@@ -35,6 +35,10 @@ class ApiMiddleware:
         if not request.path.startswith("/api"):
             return self.get_response(request)
 
+        # Don't process WebSocket requests
+        if request.path.startswith("/api/v3/ws"):
+            return self.get_response(request)
+
         api_path = request.path[5:].lower()
 
         api_route = self.get_route(api_path)

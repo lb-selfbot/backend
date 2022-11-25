@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/4.0/howto/deployment/asgi/
 
 import os
 
-from channels.auth import AuthMiddlewareStack
+from channels.security.websocket import AllowedHostsOriginValidator
 from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lightningbot.settings")
@@ -22,6 +23,8 @@ import api.urls
 application = ProtocolTypeRouter(
     {
         "http": django_app,
-        "websocket": AuthMiddlewareStack(URLRouter(api.urls.websocket_urlpatterns)),
+        "websocket": AllowedHostsOriginValidator(
+            AuthMiddlewareStack(URLRouter(api.urls.websocket_urlpatterns))
+        ),
     }
 )
