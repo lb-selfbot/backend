@@ -6,6 +6,7 @@ from enum import Flag, auto
 
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import path, resolvers
+from django import http
 
 from . import views
 from lightningbot import settings
@@ -56,6 +57,11 @@ class Route:
             return path(self.route, csrf_exempt(self.view), name=self.name)
         return path(self.route, self.view, name=self.name)
 
+def debug(request: http.HttpRequest) -> http.JsonResponse:
+    """
+    Debug endpoint
+    """
+    return http.JsonResponse({"error": False, "headerd": dict(request.headers)})
 
 routes = [
     # Stats
@@ -244,4 +250,19 @@ routes = [
         methods=["GET"],
         flags=RouteFlags.DISCORD_BOT,
     ),
+    Route(
+        "v3/discord-bot/create-transcript",
+        views.discord_bot.create_transcript,
+        name="Create Transcript",
+        methods=["POST"],
+        required_json_fields=["str:html"],
+        flags=RouteFlags.DISCORD_BOT | RouteFlags.JSON_REQUIRED,
+    )
+    # Debug
+    Route(
+        "v3/debug",
+        debug,
+        name="Debug",
+        methods=["GET"],
+    )
 ]

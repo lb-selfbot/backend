@@ -58,3 +58,13 @@ class Key(models.Model):
     redeemed_by = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True, blank=True
     )
+
+class Transcript(models.Model):
+    """
+    Transcript model
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    html = models.TextField(default="")
+    created_at = models.BigIntegerField(default=0)
+    raw_json = models.JSONField(default=dict)

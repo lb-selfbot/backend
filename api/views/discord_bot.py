@@ -4,7 +4,8 @@ API views for the Discord bot
 from django import http
 from django.views.decorators.csrf import csrf_exempt
 
-from ..utils import keys
+from ..models import Transcript
+from ..utils import keys, misc
 
 
 @csrf_exempt
@@ -55,3 +56,15 @@ def check_key(request: http.HttpRequest) -> http.JsonResponse:
             },
         }
     )
+
+def create_transcript(request: http.HttpRequest) -> http.JsonResponse:
+    """
+    Create a transcript
+    """
+    html = request.POST["html"]
+    if html is None:
+        return http.JsonResponse({"error": True, "reason": "Missing html"}, status=400)
+
+    Transcript.objects.create(html=html, code=misc.random_string(15))
+
+    return http.JsonResponse({"error": False, "code": code})
