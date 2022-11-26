@@ -6,6 +6,8 @@ import os
 import json
 import time
 import typing
+import random
+import string
 
 from django.utils import timezone
 from django.contrib import auth
@@ -33,6 +35,8 @@ class SelfbotConsumer(WebsocketConsumer):
         self.password: str = None
         self.computer_name: str = None
         self.console_text: str = None
+
+        self.instance_id = random.choices(string.ascii_letters + string.digits, k=50)
 
     def group_add(self, group_name: str, channel_name: str):
         """
@@ -181,8 +185,8 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         Called when the selfbot websocket is connected
         """
-        channel_name = event.get("channel_name")
-        if channel_name != self.channel_name:
+
+        if event.get("channel_name") != self.channel_name:
             print("ANOTHER_SELFBOT_CONNECTED")
             self.send_to_selfbot(
                 {
@@ -208,7 +212,7 @@ class SelfbotConsumer(WebsocketConsumer):
             self.group_name,
             {
                 "type": "selfbot_connect",
-                "channel": self.channel_name,
+                "channel_name": self.channel_name,
                 "computer_name": self.computer_name,
                 "console_text": self.console_text,
             },

@@ -102,7 +102,6 @@ def login(request: http.HttpRequest) -> http.HttpResponse:
     """
     Login to an account
     """
-    print("inside login")
     username: str = request.POST["username"]
     password: str = request.POST["password"]
     session = bool(request.POST["session"])
