@@ -257,7 +257,7 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:html"],
         flags=RouteFlags.DISCORD_BOT | RouteFlags.JSON_REQUIRED,
-    )
+    ),
     # Debug
     Route(
         "v3/debug",
