@@ -65,6 +65,8 @@ def create_transcript(request: http.HttpRequest) -> http.JsonResponse:
     if html is None:
         return http.JsonResponse({"error": True, "reason": "Missing html"}, status=400)
 
-    Transcript.objects.create(html=html, code=misc.random_string(15))
+    code = misc.random_string(15)
+
+    Transcript.objects.create(html=html, code=code)
 
     return http.JsonResponse({"error": False, "code": code})
