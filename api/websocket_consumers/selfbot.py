@@ -3,7 +3,6 @@ Selfbot websocket consumer
 """
 
 import os
-import json
 import time
 import typing
 import random
