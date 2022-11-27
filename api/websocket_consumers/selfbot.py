@@ -60,7 +60,7 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         Send a message to the selfbot websocket
         """
-        self.send(json.dumps(message), close=close)
+        self.send(encryption.encrypt(message), close=close)
 
     def close_ws(self, code: int):
         """
