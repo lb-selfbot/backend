@@ -240,6 +240,7 @@ routes = [
         views.admin.create_release,
         name="Create Release",
         methods=["POST"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
     ),
     # Discord Bot
     Route(
