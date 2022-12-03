@@ -66,3 +66,15 @@ class Transcript(models.Model):
 
     html = models.TextField(default="")
     code = models.CharField(max_length=255, default="")
+
+
+class Release(models.Model):
+    """
+    Release model
+    """
+
+    version = models.CharField(max_length=255, default="")
+    branch = models.CharField(max_length=255, default="")
+    changelog = models.TextField(default="")
+    filename = models.CharField(max_length=255, default="")
+    created_at = models.DateTimeField(auto_now_add=True)

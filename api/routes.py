@@ -203,6 +203,14 @@ routes = [
         required_json_fields=["str:key"],
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/check-version",
+        views.selfbot.check_version,
+        name="Check Version",
+        methods=["POST"],
+        required_json_fields=["str:branch", "str:version"],
+        flags=RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",
@@ -226,6 +234,12 @@ routes = [
         name="Create Key",
         methods=["POST"],
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
+        "v3/admin/create-release",
+        views.admin.create_release,
+        name="Create Release",
+        methods=["POST"],
     ),
     # Discord Bot
     Route(
