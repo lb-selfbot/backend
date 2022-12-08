@@ -62,7 +62,6 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
                 "version": latest_release.version,
                 "branch": latest_release.branch,
                 "changelog": latest_release.changelog,
-                "filename": latest_release.filename,
             },
         }
     )
