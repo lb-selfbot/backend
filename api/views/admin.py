@@ -6,7 +6,7 @@ import os
 from django import http
 
 from lightningbot import settings
-from ..utils import keys
+from ..utils import keys, github
 from ..models import Release
 
 # POST /api/v3/admin/create-key
@@ -27,31 +27,30 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
     version = request.POST.get("version")
     branch = request.POST.get("branch")
     changelog = request.POST.get("changelog")
-    filename = request.POST.get("filename")
-    executable = request.FILES.get("executable")
 
     # Check if any of the fields are None
-    if any(
-        map(lambda x: x is None, [version, branch, changelog, filename, executable])
-    ):
+    if any(map(lambda x: x is None, [version, branch, changelog])):
         return http.JsonResponse(
             {"error": True, "message": "Missing required fields."}, status=400
         )
 
-    filename = filename.replace("/", "").replace("\\", "")
+    # save the executables from GitHub actions to static folder
+    executables_path = os.path.join(settings.STATIC_ROOT, "executables")
+    if not os.path.exists(executables_path):
+        os.makedirs(executables_path)
 
-    # save the file to static folder
-    releases_path = os.path.join(settings.STATIC_ROOT, "releases")
-    os.makedirs(releases_path, exist_ok=True)
-    with open(f"{releases_path}/{filename}", "wb+") as file:
-        for chunk in executable.chunks():
-            file.write(chunk)
+    try:
+        github.download_latest_artifact("LightningDev1", "LB-Selfbot", executables_path)
+    except Exception as exc:
+        return http.JsonResponse(
+            {"error": True, "message": f"Failed to download artifact: {exc}"},
+            status=500,
+        )
 
     Release.objects.create(
         version=version,
         branch=branch,
         changelog=changelog,
-        filename=filename,
     )
 
     return http.JsonResponse({"error": False, "release": ""})
