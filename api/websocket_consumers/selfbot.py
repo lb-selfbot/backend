@@ -169,6 +169,9 @@ class SelfbotConsumer(WebsocketConsumer):
 
                 self.send_to_selfbot({"op": "HELLO_ACK"})
             case "PING":
+                # Add 1 minute to login time
+                self.django_user.login_time += 60
+                self.django_user.save()
                 self.send_to_selfbot({"op": "PONG"})
             case "CONSOLE_APPEND" | "CONSOLE_CLEAR" | "CONSOLE_SET" | "CONFIG_UPDATE":
                 # Generic case to relay message to website
