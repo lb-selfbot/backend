@@ -39,8 +39,15 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
     if not os.path.exists(executables_path):
         os.makedirs(executables_path)
 
+    repo_name = ""
+
+    if branch == "selfbot":
+        repo_name = "LB-Selfbot"
+    elif branch == "ui":
+        repo_name = "LB-UI"
+
     try:
-        github.download_latest_artifact("LightningDev1", "LB-Selfbot", executables_path)
+        github.download_latest_artifact("LightningDev1", repo_name, executables_path)
     except Exception as exc:
         return http.JsonResponse(
             {"error": True, "message": f"Failed to download artifact: {exc}"},
