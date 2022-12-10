@@ -56,6 +56,7 @@ class Route:
             return path(self.route, csrf_exempt(self.view), name=self.name)
         return path(self.route, self.view, name=self.name)
 
+
 routes = [
     # Stats
     Route(
@@ -240,7 +241,10 @@ routes = [
         views.admin.create_release,
         name="Create Release",
         methods=["POST"],
-        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+        required_json_fields=["str:version", "str:branch", "str:changelog"],
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
     ),
     # Discord Bot
     Route(
@@ -265,5 +269,5 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:html"],
         flags=RouteFlags.DISCORD_BOT | RouteFlags.JSON_REQUIRED,
-    )
+    ),
 ]

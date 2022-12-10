@@ -28,12 +28,6 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
     branch = request.POST.get("branch")
     changelog = request.POST.get("changelog")
 
-    # Check if any of the fields are None
-    if any(map(lambda x: x is None, [version, branch, changelog])):
-        return http.JsonResponse(
-            {"error": True, "message": "Missing required fields."}, status=400
-        )
-
     # save the executables from GitHub actions to static folder
     executables_path = os.path.join(settings.STATIC_ROOT, "executables")
     if not os.path.exists(executables_path):
