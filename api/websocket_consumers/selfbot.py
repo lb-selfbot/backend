@@ -11,14 +11,13 @@ import string
 from django.utils import timezone
 from django.contrib import auth
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 
 from ..utils.encryption import Encryption
 
 from ..models import User
 
 encryption = Encryption(os.environ["ENCRYPTION_KEY"])
-
 
 class SelfbotConsumer(WebsocketConsumer):
     """
@@ -79,6 +78,7 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         Called when a WebSocket connection is closed.
         """
+        print(code)
         if self.group_name:
             self.group_send(
                 self.group_name,

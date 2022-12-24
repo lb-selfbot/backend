@@ -4,6 +4,7 @@ Misc API views
 import json
 import random
 import typing
+import requests
 from django import http
 import googlesearch
 from googlesearch.exceptions import GoogleSearchException
@@ -155,3 +156,67 @@ def ccgen(request: http.HttpRequest) -> http.HttpResponse:
             )
 
     return http.JsonResponse({"status": 200, **credit_card})
+
+
+reddit_headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Sec-Ch-Ua": '"Opera GX";v="93", "Not\\A)Brand";v="99", "Chromium";v="93"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+# /api/v3/misc/ccgen
+def meme(_request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Meme generator
+    """
+
+    fetching_error = http.JsonResponse(
+        {
+            "status": 500,
+            "message": "An error occurred while fetching the results.",
+        },
+        status=500,
+    )
+
+    response = requests.get(
+        "https://www.reddit.com/r/memes/hot.json",
+        headers=reddit_headers,
+        timeout=10,
+    )
+
+    if response.status_code != 200:
+        return fetching_error
+
+    try:
+        memes = response.json()["data"]["children"]
+    except KeyError:
+        return fetching_error
+
+    try:
+        memes = [meme["data"] for meme in memes if meme["data"]["url"].endswith(".jpg")]
+    except (KeyError, AttributeError):
+        return fetching_error
+
+    if not memes:
+        return fetching_error
+
+    raw_meme_data = random.choice(memes)
+
+    meme_data = {
+        "title": raw_meme_data["title"],
+        "imagelink": raw_meme_data["url"],
+        "upvotes": raw_meme_data["ups"],
+        "permalink": "https://reddit.com" + raw_meme_data["permalink"],
+        "subreddit": raw_meme_data["subreddit_name_prefixed"],
+        "author": raw_meme_data["author"],
+    }
+
+    return http.JsonResponse({"status": 200, "meme": meme_data})

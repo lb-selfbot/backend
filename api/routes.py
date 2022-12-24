@@ -108,6 +108,12 @@ routes = [
         name="Credit Card Gen",
         methods=["GET"],
     ),
+    Route(
+        "v3/misc/meme",
+        views.misc.meme,
+        name="Meme Gen",
+        methods=["GET"],
+    ),
     # Authentication
     Route(
         "v3/auth/register",
@@ -269,5 +275,114 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:html"],
         flags=RouteFlags.DISCORD_BOT | RouteFlags.JSON_REQUIRED,
+    ),
+    # Image Generation
+    Route(
+        "v3/imagegen/achievement",
+        views.imagegen.achievement,
+        name="Achievement",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/amiajoke",
+        views.imagegen.amiajoke,
+        name="Am I A Joke To You",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/bad",
+        views.imagegen.bad,
+        name="Bad",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/calling",
+        views.imagegen.calling,
+        name="Calling",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/captcha",
+        views.imagegen.captcha,
+        name="Captcha",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/didyoumean",
+        views.imagegen.didyoumean,
+        name="Did You Mean",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/drake",
+        views.imagegen.drake,
+        name="Drake",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/facts",
+        views.imagegen.facts,
+        name="Facts",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/filter",
+        views.imagegen.filter_image,
+        name="Filter",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/floor",
+        views.imagegen.floor,
+        name="Floor",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/jokeoverhead",
+        views.imagegen.jokeoverhead,
+        name="Joke Overhead",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/trash",
+        views.imagegen.trash,
+        name="Trash",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/pornhub",
+        views.imagegen.pornhub,
+        name="Pornhub",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/salty",
+        views.imagegen.salty,
+        name="Salty",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/scroll",
+        views.imagegen.scroll,
+        name="Scroll",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/shame",
+        views.imagegen.shame,
+        name="Shame",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/ship",
+        views.imagegen.ship,
+        name="Ship",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/what",
+        views.imagegen.what,
+        name="What",
+        methods=["GET"],
     ),
 ]

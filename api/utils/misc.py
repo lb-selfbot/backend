@@ -3,6 +3,10 @@ Misc utils
 """
 import random
 import string
+import io
+
+import PIL
+import PIL.Image
 
 from django import http
 
@@ -26,3 +30,11 @@ def random_string(length):
     return "".join(
         random.choice(string.ascii_letters + string.digits) for _ in range(length)
     )
+
+def image_to_bytes(image: PIL.Image) -> bytes:
+    """
+    Convert a PIL image to bytes
+    """
+    output = io.BytesIO()
+    image.save(output, format='PNG')
+    return output.getvalue()
