@@ -32,7 +32,7 @@ def create_key(user: User = None, key=None, create_reason="", created_by="") -> 
     )
     if user:
         user.redeemed_key = key
-        user.account_type = "Lifetime"
+        user.account_type = "Premium"
         user.save()
     return key
 

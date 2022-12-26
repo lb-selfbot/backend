@@ -20,9 +20,7 @@ def create_password_reset_token(user: User):
     return PasswordResetToken.objects.create(
         user=user,
         token=misc.random_string(32),
-        created_at=round(
-            time.time(),
-        ),
+        created_at=round(time.time()),
     )
 
 

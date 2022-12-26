@@ -34,7 +34,7 @@ def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
         return http.JsonResponse({"error": True, "message": "Invalid key."}, status=400)
     key.redeemed_by = request.user
     request.user.redeemed_key = key
-    request.user.account_type = "Lifetime"
+    request.user.account_type = "Premium"
     key.save()
     request.user.save()
     return http.JsonResponse({"error": False})

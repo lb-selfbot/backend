@@ -44,6 +44,7 @@ class Order(models.Model):
     order_id = models.CharField(max_length=255, default="")
     key = models.CharField(max_length=255, default="")
     raw_json = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Key(models.Model):
@@ -53,7 +54,7 @@ class Key(models.Model):
 
     key = models.CharField(max_length=255, default="")
     created_by = models.CharField(max_length=255, default="")
-    created_at = models.BigIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
     create_reason = models.TextField(default="")
     redeemed_by = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True, blank=True

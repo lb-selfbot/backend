@@ -252,6 +252,34 @@ routes = [
         | RouteFlags.ADMIN_REQUIRED
         | RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/admin/table-data/users",
+        views.admin.table_data_users,
+        name="Table Data - Users",
+        methods=["GET"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
+        "v3/admin/table-data/keys",
+        views.admin.table_data_keys,
+        name="Table Data - Keys",
+        methods=["GET"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
+        "v3/admin/table-data/orders",
+        views.admin.table_data_orders,
+        name="Table Data - Orders",
+        methods=["GET"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
+        "v3/admin/table-data/releases",
+        views.admin.table_data_releases,
+        name="Table Data - Releases",
+        methods=["GET"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
     # Discord Bot
     Route(
         "v3/discord-bot/create-key",

@@ -68,7 +68,7 @@ class PayPalSDK:
                 user=user, create_reason=f"Purchase ({order_id})", created_by="API"
             )
             user.redeemed_key = key_instance
-            user.account_type = "Lifetime"
+            user.account_type = "Premium"
             user.save()
 
         response.raw_result["key"] = key_instance.key if key_instance else ""

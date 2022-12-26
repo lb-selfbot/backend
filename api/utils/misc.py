@@ -66,7 +66,7 @@ def seconds_to_readable_time(seconds: int) -> str:
     if seconds != 0:
         readable_time += f"{seconds}s"
 
-    return readable_time.strip()
+    return readable_time.strip() or "0s"
 
 
 def get_rpm() -> int:
@@ -76,7 +76,7 @@ def get_rpm() -> int:
     apache_access_log = "/var/log/apache2/access.log"
 
     with open(apache_access_log, "r", encoding="utf8") as file:
-        lines = file.readlines()[::-1][:100]
+        lines = file.readlines()[::-1][:200]
 
     date_regex = re.compile(r"- \[(.*?)\]")
 
