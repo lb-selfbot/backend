@@ -1,9 +1,11 @@
 """
 Misc utils
 """
+import re
+import io
 import random
 import string
-import io
+import datetime
 
 import PIL
 import PIL.Image
@@ -23,7 +25,7 @@ def get_user_ip(request: http.HttpRequest) -> str:
     return ip_address
 
 
-def random_string(length):
+def random_string(length: int) -> str:
     """
     Generate a random string
     """
@@ -31,10 +33,65 @@ def random_string(length):
         random.choice(string.ascii_letters + string.digits) for _ in range(length)
     )
 
+
 def image_to_bytes(image: PIL.Image) -> bytes:
     """
     Convert a PIL image to bytes
     """
     output = io.BytesIO()
-    image.save(output, format='PNG')
+    image.save(output, format="PNG")
     return output.getvalue()
+
+
+def seconds_to_readable_time(seconds: int) -> str:
+    """
+    Convert seconds to a readable time
+    """
+    days = int(seconds // 86400)
+    hours = int((seconds % 86400) // 3600)
+    minutes = int((seconds % 3600) // 60)
+    seconds = int(seconds % 60)
+
+    readable_time = ""
+
+    if days != 0:
+        readable_time += f"{days}d "
+
+    if hours != 0:
+        readable_time += f"{hours}h "
+
+    if minutes != 0:
+        readable_time += f"{minutes}m "
+
+    if seconds != 0:
+        readable_time += f"{seconds}s"
+
+    return readable_time.strip()
+
+
+def get_rpm() -> int:
+    """
+    Get the requests per minute
+    """
+    apache_access_log = "/var/log/apache2/access.log"
+
+    with open(apache_access_log, "r", encoding="utf8") as file:
+        lines = file.readlines()[::-1][:100]
+
+    date_regex = re.compile(r"- \[(.*?)\]")
+
+    # get current date with timezone
+    timezone = datetime.timezone(datetime.timedelta(hours=0))
+    now = datetime.datetime.now(tz=timezone)
+
+    requests_in_last_minute = []
+
+    for line in lines:
+        date_string = date_regex.findall(line)[0]
+        parsed_date = datetime.datetime.strptime(date_string, "%d/%b/%Y:%H:%M:%S %z")
+
+        # check if parsed_date was in the last minute
+        if now - parsed_date < datetime.timedelta(minutes=1):
+            requests_in_last_minute.append(line)
+
+    return len(requests_in_last_minute)
