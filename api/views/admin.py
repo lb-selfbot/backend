@@ -88,6 +88,7 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
             {
                 "id": user.id,
                 "username": user.username,
+                "email": user.email,
                 "loginData": f"{user.logins} logins, logged in for {login_time}",
                 "key": user.redeemed_key.key if user.redeemed_key else "None",
                 "accountType": user.account_type,
