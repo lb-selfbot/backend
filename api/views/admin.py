@@ -92,6 +92,9 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
                 "key": user.redeemed_key.key if user.redeemed_key else "None",
                 "accountType": user.account_type,
                 "flags": ", ".join(flags),
+                "createdAt": user.created_at.strftime("%Y-%m-%d %H:%M:%S")
+                if user.created_at
+                else "None",
             }
         )
 

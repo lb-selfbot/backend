@@ -22,6 +22,7 @@ class User(AbstractUser):
     redeemed_key = models.ForeignKey(
         "Key", on_delete=models.CASCADE, null=True, blank=True
     )
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class PasswordResetToken(models.Model):
