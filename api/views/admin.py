@@ -7,7 +7,7 @@ from django import http
 
 from lightningbot import settings
 
-from ..utils import keys, github, misc
+from ..utils import keys, github, misc, password_reset
 from ..models import User, Key, Order, Release
 
 # POST /api/v3/admin/create-key
@@ -30,6 +30,9 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
     version = request.POST.get("version")
     branch = request.POST.get("branch")
     changelog = request.POST.get("changelog")
+
+    if not request.user.is_superuser:
+        return http.JsonResponse({"error": True, "message": "Not authorized"}, status=403)
 
     # save the executables from GitHub actions to static folder
     executables_path = os.path.join(settings.STATIC_ROOT, "executables")
@@ -58,6 +61,28 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
     )
 
     return http.JsonResponse({"error": False, "release": ""})
+
+
+# POST /api/v3/admin/delete-release
+def delete_release(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Delete a release
+    """
+    release_id = request.POST.get("release_id")
+
+    if not request.user.is_superuser:
+        return http.JsonResponse({"error": True, "message": "Not authorized"}, status=403)
+    
+    try:
+        release = Release.objects.get(id=release_id)
+    except Release.DoesNotExist:
+        return http.JsonResponse(
+            {"error": True, "message": "Release does not exist"}, status=404
+        )
+
+    release.delete()
+
+    return http.JsonResponse({"error": False})
 
 
 # POST /api/v3/admin/table-data/users
@@ -144,6 +169,7 @@ def table_data_orders(_request: http.HttpRequest) -> http.HttpResponse:
                 "createdAt": order.created_at.strftime("%Y-%m-%d %H:%M:%S")
                 if order.created_at
                 else "None",
+                "rawJson": order.raw_json,
             }
         )
 
@@ -171,3 +197,92 @@ def table_data_releases(_request: http.HttpRequest) -> http.HttpResponse:
         )
 
     return http.JsonResponse({"error": False, "data": releases_data})
+
+
+# POST /api/v3/admin/action/user
+def action_user(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    User actions
+    """
+    action: str = request.POST.get("action")
+    user_id: int = request.POST.get("user_id")
+    data = request.POST.get("data")
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return http.JsonResponse(
+            {"error": True, "message": "User does not exist!"}, status=404
+        )
+    
+    if user.is_staff and not request.user.is_superuser:
+        return http.JsonResponse(
+            {"error": True, "message": "You cannot modify staff members!"}, status=403
+        )
+
+    match action:
+        case "set_username":
+            user.username = data
+        case "set_password":
+            user.set_password(data)
+        case "set_email":
+            user.email = data
+        case "set_key":
+            if data == "":
+                user.redeemed_key = None
+            else:
+                try:
+                    key = Key.objects.get(key=data)
+                except Key.DoesNotExist:
+                    return http.JsonResponse(
+                        {"error": True, "message": "Key does not exist!"}, status=404
+                    )
+
+                user.redeemed_key = key
+        case "set_active":
+            user.is_active = data == "true"
+        case "set_staff":
+            user.is_staff = data == "true"
+        case "set_tester":
+            user.is_tester = data == "true"
+        case "delete":
+            user.delete()
+        case "reset_free_trial":
+            user.free_trial_expiry = 0
+        case "send_password_reset_email":
+            password_reset.send_reset_password_email(request, user)
+
+    if action != "delete":
+        user.save()
+
+    return http.JsonResponse({"error": False})
+
+
+# POST /api/v3/admin/action/key
+def action_key(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Key actions
+    """
+    action: str = request.POST.get("action")
+    key_id: int = request.POST.get("key_id")
+
+    try:
+        key = Key.objects.get(id=key_id)
+    except Key.DoesNotExist:
+        return http.JsonResponse(
+            {"error": True, "message": "Key does not exist!"}, status=404
+        )
+
+    match action:
+        case "delete":
+            key.delete()
+        case "set_unredeemed":
+            if key.redeemed_by:
+                key.redeemed_by.redeemed_key = None
+                key.redeemed_by.account_type = "None"
+                key.redeemed_by.save()
+
+            key.redeemed_by = None
+            key.save()
+
+    return http.JsonResponse({"error": False})

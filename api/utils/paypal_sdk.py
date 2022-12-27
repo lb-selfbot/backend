@@ -63,12 +63,14 @@ class PayPalSDK:
         response = self.client.execute(request)
         raw_json = json.dumps(response.raw_result, indent=4)
         key_instance = None
+
         if response.raw_result["status"] == "COMPLETED":
             key_instance = keys.create_key(
                 user=user, create_reason=f"Purchase ({order_id})", created_by="API"
             )
             user.redeemed_key = key_instance
             user.account_type = "Premium"
+            user.email = response.raw_result["payer"]["email_address"]
             user.save()
 
         response.raw_result["key"] = key_instance.key if key_instance else ""

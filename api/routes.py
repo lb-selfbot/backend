@@ -253,6 +253,16 @@ routes = [
         | RouteFlags.JSON_REQUIRED,
     ),
     Route(
+        "v3/admin/delete-release",
+        views.admin.delete_release,
+        name="Delete Release",
+        methods=["POST"],
+        required_json_fields=["int:release_id"],
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
+    ),
+    Route(
         "v3/admin/table-data/users",
         views.admin.table_data_users,
         name="Table Data - Users",
@@ -279,6 +289,26 @@ routes = [
         name="Table Data - Releases",
         methods=["GET"],
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
+        "v3/admin/action/user",
+        views.admin.action_user,
+        name="Table Action - User",
+        methods=["POST"],
+        required_json_fields=["str:action", "int:user_id", "str:data"],
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
+    ),
+    Route(
+        "v3/admin/action/key",
+        views.admin.action_key,
+        name="Table Action - Key",
+        methods=["POST"],
+        required_json_fields=["str:action", "int:key_id"],
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
     ),
     # Discord Bot
     Route(
