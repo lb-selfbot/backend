@@ -69,6 +69,15 @@ def seconds_to_readable_time(seconds: int) -> str:
     return readable_time.strip() or "0s"
 
 
+def format_datetime(datetime: datetime.datetime) -> str:
+    """
+    Format a datetime object
+    """
+    if datetime is None:
+        return "None"
+    return datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+
 def get_rpm() -> int:
     """
     Get the requests per minute

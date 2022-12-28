@@ -14,6 +14,7 @@ class User(AbstractUser):
     account_type = models.CharField(max_length=64, default="None")
     free_trial_expiry = models.BigIntegerField(default=0)
     last_selfbot_login = models.DateTimeField(blank=True, null=True)
+    last_selfbot_ping = models.DateTimeField(blank=True, null=True)
     logins = models.IntegerField(default=0)
     heartbeats = models.IntegerField(default=0)
     login_time = models.BigIntegerField(default=0)

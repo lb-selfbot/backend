@@ -270,6 +270,13 @@ routes = [
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
     ),
     Route(
+        "v3/admin/table-data/online-users",
+        views.admin.table_data_online_users,
+        name="Table Data - Online Users",
+        methods=["GET"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
         "v3/admin/table-data/keys",
         views.admin.table_data_keys,
         name="Table Data - Keys",

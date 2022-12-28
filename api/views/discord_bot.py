@@ -50,7 +50,7 @@ def check_key(request: http.HttpRequest) -> http.JsonResponse:
             "key": {
                 "key": key.key,
                 "created_by": key.created_by,
-                "created_at": key.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "created_at": misc.format_datetime(key.created_at),
                 "create_reason": key.create_reason,
                 "redeemed_by": redeemed_by,
             },

@@ -4,6 +4,7 @@ Admin API views
 import os
 
 from django import http
+from django.utils import timezone
 
 from lightningbot import settings
 
@@ -118,9 +119,35 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
                 "key": user.redeemed_key.key if user.redeemed_key else "None",
                 "accountType": user.account_type,
                 "flags": ", ".join(flags),
-                "createdAt": user.created_at.strftime("%Y-%m-%d %H:%M:%S")
-                if user.created_at
-                else "None",
+                "createdAt": misc.format_datetime(user.created_at),
+            }
+        )
+
+    return http.JsonResponse({"error": False, "data": users})
+    
+
+# POST /api/v3/admin/table-data/online-users
+def table_data_online_users(_request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Get table data for users
+    """
+    one_minute_ago = timezone.now() - timezone.timedelta(minutes=1)
+
+    user_models = User.objects.filter(last_selfbot_ping__gt=one_minute_ago)
+    users = []
+
+    for user in user_models.all():
+        login_time = misc.seconds_to_readable_time(user.login_time)
+
+        users.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "key": user.redeemed_key.key if user.redeemed_key else "None",
+                "accountType": user.account_type,
+                "loggedInAt": misc.format_datetime(user.last_selfbot_login),
+                "loginData": f"{user.logins} logins, logged in for {login_time}",
+                "lastPingAt": misc.format_datetime(user.last_selfbot_ping),
             }
         )
 
@@ -140,9 +167,7 @@ def table_data_keys(_request: http.HttpRequest) -> http.HttpResponse:
                 "id": key.id,
                 "key": key.key,
                 "createdBy": key.created_by,
-                "createdAt": key.created_at.strftime("%Y-%m-%d %H:%M:%S")
-                if key.created_at
-                else "None",
+                "createdAt": misc.format_datetime(key.created_at),
                 "createReason": key.create_reason,
                 "redeemedBy": key.redeemed_by.username if key.redeemed_by else "None",
             }
@@ -166,9 +191,7 @@ def table_data_orders(_request: http.HttpRequest) -> http.HttpResponse:
                 "status": order.status,
                 "orderId": order.order_id,
                 "key": order.key,
-                "createdAt": order.created_at.strftime("%Y-%m-%d %H:%M:%S")
-                if order.created_at
-                else "None",
+                "createdAt": misc.format_datetime(order.created_at),
                 "rawJson": order.raw_json,
             }
         )
@@ -190,9 +213,7 @@ def table_data_releases(_request: http.HttpRequest) -> http.HttpResponse:
                 "branch": release.branch,
                 "version": release.version,
                 "changelog": release.changelog,
-                "createdAt": release.created_at.strftime("%Y-%m-%d %H:%M:%S")
-                if release.created_at
-                else "None",
+                "createdAt": misc.format_datetime(release.created_at),
             }
         )
 

@@ -78,7 +78,6 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         Called when a WebSocket connection is closed.
         """
-        print(code)
         if self.group_name:
             self.group_send(
                 self.group_name,
@@ -108,8 +107,9 @@ class SelfbotConsumer(WebsocketConsumer):
                 # Free trial expired, close connection
                 return 3011
 
-        self.django_user.last_login = timezone.now()
         self.django_user.logins = self.django_user.logins + 1
+        self.django_user.last_selfbot_login = timezone.now()
+        self.django_user.last_selfbot_ping = timezone.now()
         self.django_user.save()
         return 0
 
@@ -171,6 +171,7 @@ class SelfbotConsumer(WebsocketConsumer):
             case "PING":
                 # Add 1 minute to login time
                 self.django_user.login_time += 60
+                self.django_user.last_selfbot_ping = timezone.now()
                 self.django_user.save()
                 self.send_to_selfbot({"op": "PONG"})
             case "CONSOLE_APPEND" | "CONSOLE_CLEAR" | "CONSOLE_SET" | "CONFIG_UPDATE":
@@ -189,7 +190,6 @@ class SelfbotConsumer(WebsocketConsumer):
         """
 
         if event.get("channel_name") != self.channel_name:
-            print("ANOTHER_SELFBOT_CONNECTED")
             self.send_to_selfbot(
                 {
                     "op": "ANOTHER_SELFBOT_CONNECTED",
