@@ -86,7 +86,7 @@ class ApiMiddleware:
                 request.user = user
 
         if routes.RouteFlags.ADMIN_REQUIRED in api_route.flags:
-            if not request.user.is_staff:
+            if not request.user.is_staff and not request.user.is_superuser:
                 return errors.admin_required()
 
         if routes.RouteFlags.DISCORD_BOT in api_route.flags:
