@@ -215,7 +215,9 @@ def action_user(request: http.HttpRequest) -> http.HttpResponse:
             {"error": True, "message": "User does not exist!"}, status=404
         )
     
-    if user.is_staff and not request.user.is_superuser:
+    is_staff = user.is_staff or user.is_superuser
+
+    if is_staff and not request.user.is_superuser:
         return http.JsonResponse(
             {"error": True, "message": "You cannot modify staff members!"}, status=403
         )

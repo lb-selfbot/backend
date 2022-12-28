@@ -21,7 +21,7 @@ def all_stats(user: User) -> dict:
         "logins": User.objects.aggregate(Sum("logins"))["logins__sum"],
     }
 
-    if user.is_staff:
+    if user.is_staff or user.is_superuser:
         stats["admin"] = admin_stats()
 
     return stats
