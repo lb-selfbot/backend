@@ -20,7 +20,7 @@ class User(AbstractUser):
     hwid = models.CharField(max_length=255, default="")
     hwid_resets = models.JSONField(default=list)
     redeemed_key = models.ForeignKey(
-        "Key", on_delete=models.CASCADE, null=True, blank=True
+        "Key", on_delete=models.SET_NULL, null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -40,7 +40,7 @@ class Order(models.Model):
     Order model
     """
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=64, default="")
     order_id = models.CharField(max_length=255, default="")
     key = models.CharField(max_length=255, default="")
@@ -58,7 +58,7 @@ class Key(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     create_reason = models.TextField(default="")
     redeemed_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True
+        User, on_delete=models.SET_NULL, null=True, blank=True
     )
 
 class Transcript(models.Model):
