@@ -85,7 +85,7 @@ def get_rpm() -> int:
     apache_access_log = "/var/log/apache2/access.log"
 
     with open(apache_access_log, "r", encoding="utf8") as file:
-        lines = file.readlines()[::-1][:200]
+        lines = file.readlines()[::-1][:5000]
 
     date_regex = re.compile(r"- \[(.*?)\]")
 
@@ -93,14 +93,14 @@ def get_rpm() -> int:
     timezone = datetime.timezone(datetime.timedelta(hours=0))
     now = datetime.datetime.now(tz=timezone)
 
-    requests_in_last_minute = []
+    requests_in_last_10_minutes = []
 
     for line in lines:
         date_string = date_regex.findall(line)[0]
         parsed_date = datetime.datetime.strptime(date_string, "%d/%b/%Y:%H:%M:%S %z")
 
         # check if parsed_date was in the last minute
-        if now - parsed_date < datetime.timedelta(minutes=1):
-            requests_in_last_minute.append(line)
+        if now - parsed_date < datetime.timedelta(minutes=10):
+            requests_in_last_10_minutes.append(line)
 
-    return len(requests_in_last_minute)
+    return len(requests_in_last_10_minutes) / 10
