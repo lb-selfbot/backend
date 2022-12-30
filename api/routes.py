@@ -156,7 +156,7 @@ routes = [
         views.auth.reset_password,
         name="Reset Password",
         methods=["POST"],
-        required_json_fields=["str:username", "str:password", "str:token"],
+        required_json_fields=["str:username", "str:new_password", "str:token"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
     Route(
