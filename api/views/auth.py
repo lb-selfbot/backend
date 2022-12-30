@@ -365,6 +365,6 @@ def auth_view(request: http.HttpRequest) -> http.HttpResponse:
                         "free_trial_expiry": user.free_trial_expiry,
                         "last_selfbot_login": user.last_selfbot_login,
                     },
-                    "stats": stats.all_stats(),
+                    "stats": stats.all_stats(user),
                 }
             )
