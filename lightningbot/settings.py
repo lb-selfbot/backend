@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "channels",
     "transcript",
     "api",
+    "dbbackup",
 ]
 
 MIDDLEWARE = [
@@ -179,3 +180,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True
+
+# Django DB Backup configuration
+
+DBBACKUP_STORAGE = "storages.backends.ftp.FTPStorage"
+DBBACKUP_STORAGE_OPTIONS = {
+    "location": os.environ.get("FTP_LOCATION"),
+}

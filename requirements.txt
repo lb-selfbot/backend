@@ -8,3 +8,4 @@ paypal-checkout-serversdk
 googlesearch-python
 python-dotenv
 django-dbbackup
+django-storages
