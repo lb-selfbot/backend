@@ -6,7 +6,7 @@ import psutil
 
 from django.db.models import Sum
 
-from ..utils import misc
+from ..utils import misc, releases
 from ..models import User
 
 
@@ -14,9 +14,13 @@ def all_stats(user: User) -> dict:
     """
     Get all stats
     """
+    latest_release = releases.get_latest("selfbot")
+
+    latest_version = latest_release.version if latest_release else "Unknown"
+
     stats = {
         "auth": "Online",
-        "version": "4.0.0",  # TODO: Get from db
+        "version": latest_version,
         "users": User.objects.count(),
         "logins": User.objects.aggregate(Sum("logins"))["logins__sum"],
     }
