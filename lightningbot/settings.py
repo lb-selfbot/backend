@@ -31,7 +31,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ADMINS = [("Lightning", "kaanisik80@gmail.com")]
+ADMINS = (("Lightning", "kaanisik80@gmail.com"),)
 
 # Application definition
 
@@ -168,6 +168,8 @@ EMAIL_HOST_USER = "password-reset@lightning-bot.com"
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+SERVER_EMAIL = "server@lightning-bot.com"
 
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = ALLOWED_HOSTS = [
     "https://api.lightning-bot.com",
