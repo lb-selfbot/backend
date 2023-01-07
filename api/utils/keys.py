@@ -5,20 +5,13 @@ import random
 import string
 
 from api.models import User, Key
-from api.utils import logs
+from api.utils import misc, logs
 
 
-def random_string(length):
-    """
-    Generate a random string
-    """
-    return "".join(
-        random.choice(string.ascii_letters + string.digits) for _ in range(length)
-    )
+def _generate_key() -> str:
+    random_strings = [misc.random_string(4) for _ in range(4)]
 
-
-def _generate_key():
-    return f"LB-{random_string(4)}-{random_string(4)}-{random_string(4)}-{random_string(4)}"
+    return "LB-" + "-".join(random_strings)
 
 
 def create_key(user: User = None, key=None, create_reason="", created_by="") -> Key:
@@ -58,6 +51,8 @@ def is_key_valid(key: str) -> Key:
         key: Key = Key.objects.get(key=key)
     except Key.DoesNotExist:
         return None
+
     if key.redeemed_by is not None:
         return None
+
     return key
