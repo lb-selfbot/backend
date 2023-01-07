@@ -87,7 +87,7 @@ def get_rpm() -> int:
     with open(apache_access_log, "r", encoding="utf8") as file:
         lines = file.readlines()[::-1][:5000]
 
-    date_regex = re.compile(r"- \[(.*?)\]")
+    date_regex = re.compile(r" \[(.*?)\] \"")
 
     # get current date with timezone
     timezone = datetime.timezone(datetime.timedelta(hours=0))
