@@ -82,9 +82,6 @@ def send_reset_password_email(request: http.HttpRequest, user: User) -> bool:
 
     message.send()
 
-    logs.create_entry(
-        log_type="send_reset_password_email",
-        user=user,
-    )
+    logs.create_entry(log_type="send_reset_password_email", user=user, info={})
 
     return True

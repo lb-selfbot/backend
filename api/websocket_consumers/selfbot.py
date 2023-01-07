@@ -106,7 +106,11 @@ class SelfbotConsumer(WebsocketConsumer):
                 self.django_user.account_type = "Free Trial"
                 self.send_to_selfbot({"op": "FREE_TRIAL_START"})
 
-                logs.create_entry("free_trial_start", self.django_user, {})
+                logs.create_entry(
+                    log_type="free_trial_start",
+                    user=self.django_user,
+                    info={},
+                )
             elif self.django_user.free_trial_expiry < int(time.time()):
                 # Free trial expired, close connection
                 return 3011
@@ -160,9 +164,9 @@ class SelfbotConsumer(WebsocketConsumer):
                     self.close_ws(code)
 
                     logs.create_entry(
-                        "selfbot_login_fail",
-                        self.django_user,
-                        {"code": code},
+                        log_type="selfbot_login_fail",
+                        user=self.django_user,
+                        info={"code": code},
                     )
                     return
 
@@ -179,7 +183,11 @@ class SelfbotConsumer(WebsocketConsumer):
 
                 self.send_to_selfbot({"op": "HELLO_ACK"})
 
-                logs.create_entry("selfbot_connect", self.django_user, {})
+                logs.create_entry(
+                    log_type="selfbot_connect",
+                    user=self.django_user,
+                    info={},
+                )
             case "PING":
                 # Add 1 minute to login time
                 self.django_user.login_time += 60

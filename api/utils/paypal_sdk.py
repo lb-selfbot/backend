@@ -58,9 +58,9 @@ class PayPalSDK:
         response = self.client.execute(request)
 
         logs.create_entry(
-            "paypal_order_created",
-            None,
-            {"order_id": response.result.id, "sandbox": self.sandbox}
+            log_type="paypal_order_created",
+            user=None,
+            info={"order_id": response.result.id, "sandbox": self.sandbox},
         )
 
         return response.result.id
@@ -88,9 +88,9 @@ class PayPalSDK:
         response.raw_result["key"] = key_instance.key if key_instance else ""
 
         logs.create_entry(
-            "paypal_order_captured",
-            user,
-            {
+            log_type="paypal_order_captured",
+            user=user,
+            info={
                 "order_id": order_id,
                 "status": response.raw_result["status"],
                 "key": response.raw_result["key"],

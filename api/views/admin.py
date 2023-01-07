@@ -306,7 +306,7 @@ def action_user(request: http.HttpRequest) -> http.HttpResponse:
     logs.create_entry(
         log_type="admin_user_action",
         user=request.user,
-        data={
+        info={
             "username": user.username,
             "user_id": user.id,
             "action": action,
@@ -347,7 +347,7 @@ def action_key(request: http.HttpRequest) -> http.HttpResponse:
     logs.create_entry(
         log_type="admin_user_action",
         user=request.user,
-        data={
+        info={
             "key": key.key,
             "key_id": key.id,
             "action": action,
