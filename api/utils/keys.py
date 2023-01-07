@@ -5,6 +5,7 @@ import random
 import string
 
 from api.models import User, Key
+from api.utils import logs
 
 
 def random_string(length):
@@ -34,6 +35,18 @@ def create_key(user: User = None, key=None, create_reason="", created_by="") -> 
         user.redeemed_key = key
         user.account_type = "Premium"
         user.save()
+
+    logs.create_entry(
+        log_type="create_key",
+        user=user,
+        info={
+            "key": key.key,
+            "create_reason": create_reason,
+            "created_by": created_by,
+            "redeem_user": getattr(user, "username", None),
+        },
+    )
+
     return key
 
 

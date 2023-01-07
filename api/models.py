@@ -62,6 +62,7 @@ class Key(models.Model):
         User, on_delete=models.SET_NULL, null=True, blank=True
     )
 
+
 class Transcript(models.Model):
     """
     Transcript model
@@ -79,4 +80,15 @@ class Release(models.Model):
     version = models.CharField(max_length=255, default="")
     branch = models.CharField(max_length=255, default="")
     changelog = models.TextField(default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Log(models.Model):
+    """
+    Log model
+    """
+
+    log_type = models.CharField(max_length=255, default="")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    info = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
