@@ -8,12 +8,14 @@ from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment, LiveEnv
 from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest
 
 from api.models import User, Order
-from . import keys
+from . import keys, logs
+
 
 class PayPalSDK:
     """
     PayPal SDK class
     """
+
     def __init__(self):
         self.sandbox = os.environ.get("PAYPAL_SANDBOX") == "true"
         if self.sandbox:
@@ -28,6 +30,7 @@ class PayPalSDK:
             self.environment = LiveEnvironment(
                 client_id=self.client_id, client_secret=self.client_secret
             )
+
         self.client = PayPalHttpClient(self.environment)
 
     def create_order(self):
@@ -40,8 +43,8 @@ class PayPalSDK:
             {
                 "intent": "CAPTURE",
                 "application_context": {
-                    "return_url": "https://lightning-bot.com/paypal-return",
-                    "cancel_url": "https://lightning-bot.com/paypal-cancel",
+                    "return_url": "https://lightning-bot.com/dashboard",
+                    "cancel_url": "https://lightning-bot.com/dashboard",
                     "shipping_preference": "NO_SHIPPING",
                 },
                 "purchase_units": [
@@ -53,6 +56,13 @@ class PayPalSDK:
             }
         )
         response = self.client.execute(request)
+
+        logs.create_entry(
+            "paypal_order_created",
+            None,
+            {"order_id": response.result.id, "sandbox": self.sandbox}
+        )
+
         return response.result.id
 
     def capture_order(self, user: User, order_id: str):
@@ -61,6 +71,8 @@ class PayPalSDK:
         """
         request = OrdersCaptureRequest(order_id)
         response = self.client.execute(request)
+        response.raw_result = response.result.dict()
+
         raw_json = json.dumps(response.raw_result, indent=4)
         key_instance = None
 
@@ -74,6 +86,18 @@ class PayPalSDK:
             user.save()
 
         response.raw_result["key"] = key_instance.key if key_instance else ""
+
+        logs.create_entry(
+            "paypal_order_captured",
+            user,
+            {
+                "order_id": order_id,
+                "status": response.raw_result["status"],
+                "key": response.raw_result["key"],
+                "raw_json": raw_json,
+                "sandbox": self.sandbox,
+            },
+        )
 
         Order.objects.create(
             user=user,

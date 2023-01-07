@@ -47,6 +47,7 @@ def validate_captcha(request: http.HttpRequest, captcha_response: str) -> bool:
         },
         timeout=5,
     )
+    
     json = response.json()
     return json["success"] and json["score"] >= 0.5
 

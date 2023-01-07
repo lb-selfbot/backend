@@ -7,7 +7,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 
-from ..utils import validation
+from ..utils import validation, logs
 from ..utils import errors
 from ..utils import stats
 from ..utils import password_reset
@@ -37,6 +37,7 @@ def register(request: http.HttpRequest) -> http.HttpResponse:
     validation_error_str = validation.ValidationResult.to_string(
         validation_error,
     )
+
     match validation_error:
         case validation.ValidationResult.MissingField:
             return http.JsonResponse(
@@ -90,11 +91,18 @@ def register(request: http.HttpRequest) -> http.HttpResponse:
         "",
         password,
     )
+
     user.save()
+
     auth.login(request, user)
-    return http.JsonResponse(
-        {"status": User.objects.get(username=username) is not None}
+
+    logs.create_entry(
+        log_type="register",
+        user=user,
+        info={"username": username},
     )
+
+    return http.JsonResponse({"status": 200})
 
 
 # /api/v3/auth/login
@@ -106,7 +114,9 @@ def login(request: http.HttpRequest) -> http.HttpResponse:
     password: str = request.POST["password"]
     session = bool(request.POST["session"])
     rememberme = bool(request.POST["rememberme"])
+
     user = auth.authenticate(request, username=username, password=password)
+
     if user is None or not user.is_authenticated:
         return http.JsonResponse(
             {
@@ -116,12 +126,15 @@ def login(request: http.HttpRequest) -> http.HttpResponse:
             },
             status=400,
         )
+
     if session:
         auth.login(request, user)
         request.session.set_expiry(0)
+
     if rememberme and session:
         # Make the session cookie expire after 30 days
         request.session.set_expiry(86400 * 30)
+
     return http.JsonResponse({"status": 200})
 
 
@@ -131,6 +144,7 @@ def logout(request: http.HttpRequest) -> http.HttpResponse:
     Log out of an account
     """
     auth.logout(request)
+
     return http.JsonResponse({"status": 200})
 
 
@@ -162,7 +176,9 @@ def forgot_password(request: http.HttpRequest) -> http.HttpResponse:
             },
             status=400,
         )
+
     password_reset.send_reset_password_email(request, user)
+
     return http.JsonResponse({"status": 200})
 
 
@@ -270,8 +286,9 @@ def get_user(request: http.HttpRequest) -> http.HttpResponse:
     """
     Get data about the current logged in user
     """
-    if str(request.user) == "AnonymousUser":
-        return errors.login_required
+    if not request.user.is_authenticated:
+        return errors.login_required()
+
     return http.JsonResponse(
         {
             "status": 200,
@@ -368,3 +385,12 @@ def auth_view(request: http.HttpRequest) -> http.HttpResponse:
                     "stats": stats.all_stats(user),
                 }
             )
+
+    return http.JsonResponse(
+        {
+            "status": 400,
+            "error": "INVALID_CLIENT_TYPE",
+            "message": "Invalid client type.",
+        },
+        status=400,
+    )

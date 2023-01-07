@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from lightningbot import settings
 
-from ..utils import keys, github, misc, password_reset
+from ..utils import keys, github, misc, password_reset, logs
 from ..models import User, Key, Order, Release
 
 # POST /api/v3/admin/create-key
@@ -33,9 +33,11 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
     changelog = request.POST.get("changelog")
 
     if not request.user.is_superuser:
-        return http.JsonResponse({"error": True, "message": "Not authorized"}, status=403)
+        return http.JsonResponse(
+            {"error": True, "message": "Not authorized"}, status=403
+        )
 
-    # save the executables from GitHub actions to static folder
+    # Save the executables from GitHub actions to static folder
     executables_path = os.path.join(settings.STATIC_ROOT, "executables")
     if not os.path.exists(executables_path):
         os.makedirs(executables_path)
@@ -46,6 +48,11 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
         repo_name = "LB-Selfbot"
     elif branch == "ui":
         repo_name = "LB-UI"
+    else:
+        return http.JsonResponse(
+            {"error": True, "message": "Invalid branch"},
+            status=400,
+        )
 
     try:
         github.download_latest_artifact("LightningDev1", repo_name, executables_path)
@@ -54,6 +61,16 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
             {"error": True, "message": f"Failed to download artifact: {exc}"},
             status=500,
         )
+
+    logs.create_entry(
+        log_type="create_release",
+        user=request.user,
+        info={
+            "version": version,
+            "branch": branch,
+            "changelog": changelog,
+        },
+    )
 
     Release.objects.create(
         version=version,
@@ -72,8 +89,10 @@ def delete_release(request: http.HttpRequest) -> http.HttpResponse:
     release_id = request.POST.get("release_id")
 
     if not request.user.is_superuser:
-        return http.JsonResponse({"error": True, "message": "Not authorized"}, status=403)
-    
+        return http.JsonResponse(
+            {"error": True, "message": "Not authorized"}, status=403
+        )
+
     try:
         release = Release.objects.get(id=release_id)
     except Release.DoesNotExist:
@@ -82,6 +101,12 @@ def delete_release(request: http.HttpRequest) -> http.HttpResponse:
         )
 
     release.delete()
+
+    logs.create_entry(
+        log_type="delete_release",
+        user=request.user,
+        info={"release_id": release_id},
+    )
 
     return http.JsonResponse({"error": False})
 
@@ -124,7 +149,7 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
         )
 
     return http.JsonResponse({"error": False, "data": users})
-    
+
 
 # POST /api/v3/admin/table-data/online-users
 def table_data_online_users(_request: http.HttpRequest) -> http.HttpResponse:
@@ -235,7 +260,7 @@ def action_user(request: http.HttpRequest) -> http.HttpResponse:
         return http.JsonResponse(
             {"error": True, "message": "User does not exist!"}, status=404
         )
-    
+
     is_staff = user.is_staff or user.is_superuser
 
     if is_staff and not request.user.is_superuser:
@@ -278,6 +303,17 @@ def action_user(request: http.HttpRequest) -> http.HttpResponse:
     if action != "delete":
         user.save()
 
+    logs.create_entry(
+        log_type="admin_user_action",
+        user=request.user,
+        data={
+            "username": user.username,
+            "user_id": user.id,
+            "action": action,
+            "data": data,
+        },
+    )
+
     return http.JsonResponse({"error": False})
 
 
@@ -307,5 +343,15 @@ def action_key(request: http.HttpRequest) -> http.HttpResponse:
 
             key.redeemed_by = None
             key.save()
+
+    logs.create_entry(
+        log_type="admin_user_action",
+        user=request.user,
+        data={
+            "key": key.key,
+            "key_id": key.id,
+            "action": action,
+        },
+    )
 
     return http.JsonResponse({"error": False})

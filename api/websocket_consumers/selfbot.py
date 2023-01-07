@@ -11,13 +11,15 @@ import string
 from django.utils import timezone
 from django.contrib import auth
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer
 
+from ..utils import logs
 from ..utils.encryption import Encryption
 
 from ..models import User
 
 encryption = Encryption(os.environ["ENCRYPTION_KEY"])
+
 
 class SelfbotConsumer(WebsocketConsumer):
     """
@@ -103,6 +105,8 @@ class SelfbotConsumer(WebsocketConsumer):
                 self.django_user.free_trial_expiry = int(time.time()) + 86400 * 7
                 self.django_user.account_type = "Free Trial"
                 self.send_to_selfbot({"op": "FREE_TRIAL_START"})
+
+                logs.create_entry("free_trial_start", self.django_user, {})
             elif self.django_user.free_trial_expiry < int(time.time()):
                 # Free trial expired, close connection
                 return 3011
@@ -154,6 +158,12 @@ class SelfbotConsumer(WebsocketConsumer):
                 # Close websocket if the user is not allowed to login
                 if (code := self.login()) != 0:
                     self.close_ws(code)
+
+                    logs.create_entry(
+                        "selfbot_login_fail",
+                        self.django_user,
+                        {"code": code},
+                    )
                     return
 
                 self.group_add(self.group_name, self.channel_name)
@@ -168,6 +178,8 @@ class SelfbotConsumer(WebsocketConsumer):
                 )
 
                 self.send_to_selfbot({"op": "HELLO_ACK"})
+
+                logs.create_entry("selfbot_connect", self.django_user, {})
             case "PING":
                 # Add 1 minute to login time
                 self.django_user.login_time += 60

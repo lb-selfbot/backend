@@ -6,11 +6,11 @@ from django import http
 from django.core import mail
 from django.template import loader
 import user_agents
-from ..utils import misc
+from ..utils import misc, logs
 from ..models import User, PasswordResetToken
 
 
-def create_password_reset_token(user: User):
+def create_password_reset_token(user: User) -> PasswordResetToken:
     """
     Create a password reset token for a user
     """
@@ -24,7 +24,7 @@ def create_password_reset_token(user: User):
     )
 
 
-def check_password_reset_token(user: User, token: PasswordResetToken):
+def check_password_reset_token(user: User, token: PasswordResetToken) -> bool:
     """
     Check if a password reset token is valid
     """
@@ -77,6 +77,14 @@ def send_reset_password_email(request: http.HttpRequest, user: User) -> bool:
         "LightningBot <password-reset@lightning-bot.com>",
         [user.email],
     )
+
     message.content_subtype = "html"
+
     message.send()
+
+    logs.create_entry(
+        log_type="send_reset_password_email",
+        user=user,
+    )
+
     return True

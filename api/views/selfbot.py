@@ -3,7 +3,7 @@ Selfbot API views
 """
 import time
 from django import http
-from api.utils import keys, releases
+from api.utils import keys, releases, logs
 
 # POST /api/v3/selfbot/reset-hwid
 def reset_hwid(request: http.HttpRequest) -> http.HttpResponse:
@@ -18,9 +18,18 @@ def reset_hwid(request: http.HttpRequest) -> http.HttpResponse:
             },
             status=400,
         )
+
     request.user.hwid = ""
     request.user.hwid_resets.append(time.time())
+
     request.user.save()
+
+    logs.create_entry(
+        log_type="hwid_reset",
+        user=request.user,
+        info={},
+    )
+
     return http.JsonResponse({"error": False})
 
 
@@ -30,13 +39,23 @@ def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
     Redeem a license key
     """
     key = keys.is_key_valid(request.POST["key"])
+
     if key is None:
         return http.JsonResponse({"error": True, "message": "Invalid key."}, status=400)
+
     key.redeemed_by = request.user
+    key.save()
+
     request.user.redeemed_key = key
     request.user.account_type = "Premium"
-    key.save()
     request.user.save()
+
+    logs.create_entry(
+        log_type="key_redeem",
+        user=request.user,
+        info={"key": key.key},
+    )
+
     return http.JsonResponse({"error": False})
 
 
@@ -50,7 +69,9 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
 
     latest_release = releases.get_latest(branch)
     if latest_release is None:
-        return http.JsonResponse({"error": True, "reason": "Invalid branch"}, status=400)
+        return http.JsonResponse(
+            {"error": True, "reason": "Invalid branch"}, status=400
+        )
 
     is_latest = latest_release.version == version
 
