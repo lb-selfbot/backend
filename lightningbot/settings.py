@@ -171,6 +171,14 @@ EMAIL_USE_SSL = False
 
 SERVER_EMAIL = "server@lightning-bot.com"
 
+ALLOWED_HOSTS = [
+    "api.lightning-bot.com",
+    "lightning-bot.com",
+    "api.lightningdev.tech",
+    "lightningdev.tech",
+    "localhost",
+]
+
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
     "https://api.lightning-bot.com",
     "https://lightning-bot.com",
