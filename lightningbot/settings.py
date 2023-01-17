@@ -152,7 +152,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = "/var/www/api.lightning-bot.com/static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -174,6 +174,8 @@ SERVER_EMAIL = "server@lightning-bot.com"
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
     "https://api.lightning-bot.com",
     "https://lightning-bot.com",
+    "https://api.lightningdev.tech",
+    "https://lightningdev.tech",
     "http://localhost:3000",
 ]
 
