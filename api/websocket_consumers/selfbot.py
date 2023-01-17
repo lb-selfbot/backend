@@ -29,7 +29,7 @@ class SelfbotConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.django_user: User = None
-        self.group_name: str = None
+        self.group_name: str = ""
 
         self.username: str = None
         self.password: str = None
