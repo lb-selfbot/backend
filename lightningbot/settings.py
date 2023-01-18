@@ -123,7 +123,7 @@ elif USE_MYSQL:
             "ENGINE": "django.db.backends.mysql",
             "NAME": "lightningbot",
             "USER": "api",
-            "PASSWORD": os.enviren["MYSQL_PASSWORD"],
+            "PASSWORD": os.environ["MYSQL_PASSWORD"],
             "HOST": os.environ["MYSQL_HOST"],
             "PORT": "3306",
         }
