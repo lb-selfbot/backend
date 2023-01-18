@@ -82,9 +82,9 @@ def get_rpm() -> int:
     """
     Get the requests per minute
     """
-    apache_access_log = "/var/log/apache2/access.log"
+    nginx_access_log = "/var/log/nginx/access.log"
 
-    with open(apache_access_log, "r", encoding="utf8") as file:
+    with open(nginx_access_log, "r", encoding="utf8") as file:
         lines = file.readlines()[::-1][:5000]
 
     date_regex = re.compile(r" \[(.*?)\] \"")
