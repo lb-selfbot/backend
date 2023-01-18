@@ -11,4 +11,4 @@ django-dbbackup
 django-storages
 psutil
 pillow
-mysqlclietn
+mysqlclient
