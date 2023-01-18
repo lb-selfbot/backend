@@ -107,12 +107,27 @@ else:
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+USE_SQLITE = os.environ["USE_SQLITE"] == "true"
+USE_MYSQL = os.environ["USE_MYSQL"] == "true"
+
+if USE_SQLITE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+elif USE_MYSQL:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": "lightningbot",
+            "USER": "api",
+            "PASSWORD": os.enviren["MYSQL_PASSWORD"],
+            "HOST": os.environ["MYSQL_HOST"],
+            "PORT": "3306",
+        }
+    }
 
 
 # Password validation
