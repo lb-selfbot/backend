@@ -85,7 +85,7 @@ ASGI_APPLICATION = "lightningbot.asgi.application"
 
 # Django Channels configuration
 
-USE_REDIS = False
+USE_REDIS = os.environ["USE_REDIS"] == "true"
 
 if USE_REDIS:
     CHANNEL_LAYERS = {
