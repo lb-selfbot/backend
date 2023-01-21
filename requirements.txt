@@ -12,3 +12,4 @@ django-storages
 psutil
 pillow
 mysqlclient
+bcrypt

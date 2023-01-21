@@ -29,7 +29,7 @@ if os.path.isfile(dotenv_file):
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ["DJANGO_DEBUG"] == "true"
 
 ADMINS = (("Lightning", "kaanisik80@gmail.com"),)
 
@@ -149,13 +149,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 PASSWORD_HASHERS = (
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-    'django.contrib.auth.hashers.BCryptPasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.SHA1PasswordHasher',
-    'django.contrib.auth.hashers.MD5PasswordHasher',
-    'django.contrib.auth.hashers.CryptPasswordHasher',
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.BCryptPasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.SHA1PasswordHasher",
+    "django.contrib.auth.hashers.MD5PasswordHasher",
+    "django.contrib.auth.hashers.CryptPasswordHasher",
 )
 
 AUTH_USER_MODEL = "api.User"
@@ -197,16 +197,20 @@ EMAIL_USE_SSL = False
 SERVER_EMAIL = "server@lightning-bot.com"
 
 ALLOWED_HOSTS = [
+    "transcripts.lightning-bot.com",
     "api.lightning-bot.com",
     "lightning-bot.com",
+    "transcripts.lightningdev.tech",
     "api.lightningdev.tech",
     "lightningdev.tech",
     "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
+    "https://transcripts.lightning-bot.com",
     "https://api.lightning-bot.com",
     "https://lightning-bot.com",
+    "https://transcripts.lightningdev.tech",
     "https://api.lightningdev.tech",
     "https://lightningdev.tech",
     "http://localhost:3000",
