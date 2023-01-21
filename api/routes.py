@@ -52,9 +52,8 @@ class Route:
         """
         Get the Django path for this route
         """
-        if settings.DEBUG:
-            return path(self.route, csrf_exempt(self.view), name=self.name)
-        return path(self.route, self.view, name=self.name)
+        
+        return path(self.route, csrf_exempt(self.view), name=self.name)
 
 
 routes = [
