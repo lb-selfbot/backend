@@ -25,7 +25,7 @@ def check_key(request: http.HttpRequest) -> http.JsonResponse:
     if key is None:
         return http.JsonResponse({"error": True, "rason": "Missing key"}, status=400)
 
-    key = keys.get_key_if_unredeemed(key)
+    key = keys.get_key(key)
     if key is None:
         return http.JsonResponse(
             {"error": True, "reason": "That key is invalid!"}, status=400
