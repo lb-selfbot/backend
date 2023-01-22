@@ -12,7 +12,7 @@ def render_transcript(request: http.HttpRequest, code: str) -> http.HttpResponse
     if request.method != "GET":
         return http.HttpResponseNotAllowed(["GET"])
 
-    if request.headers.get("X-Forwarded-Host") != "transcripts.lightning-bot.com":
+    if request.headers.get("Host") != "transcripts.lightning-bot.com":
         return http.HttpResponseForbidden()
 
     transcript = Transcript.objects.filter(code=code).first()
