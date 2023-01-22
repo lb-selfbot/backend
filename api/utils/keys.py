@@ -43,16 +43,23 @@ def create_key(user: User = None, key=None, create_reason="", created_by="") -> 
     return key
 
 
-def is_key_valid(key: str) -> Key:
+def get_key(key: str) -> Key:
     """
-    Check if a key is valid
+    Get a key
     """
     try:
-        key: Key = Key.objects.get(key=key)
+        return Key.objects.get(key=key)
     except Key.DoesNotExist:
         return None
 
-    if key.redeemed_by is not None:
-        return None
 
-    return key
+def get_key_if_unredeemed(key: str) -> Key:
+    """
+    Check if a key is valid
+    """
+    key = get_key(key)
+
+    if key and not key.redeemed_by:
+        return key
+
+    return None

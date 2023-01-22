@@ -2,13 +2,11 @@
 API views for the Discord bot
 """
 from django import http
-from django.views.decorators.csrf import csrf_exempt
 
 from ..models import Transcript
 from ..utils import keys, misc
 
 
-@csrf_exempt
 def create_key(request: http.HttpRequest) -> http.JsonResponse:
     """
     Create a new license key
@@ -27,7 +25,7 @@ def check_key(request: http.HttpRequest) -> http.JsonResponse:
     if key is None:
         return http.JsonResponse({"error": True, "rason": "Missing key"}, status=400)
 
-    key = keys.is_key_valid(key)
+    key = keys.get_key_if_unredeemed(key)
     if key is None:
         return http.JsonResponse(
             {"error": True, "reason": "That key is invalid!"}, status=400

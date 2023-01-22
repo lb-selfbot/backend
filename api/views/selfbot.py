@@ -38,7 +38,7 @@ def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Redeem a license key
     """
-    key = keys.is_key_valid(request.POST["key"])
+    key = keys.get_key_if_unredeemed(request.POST["key"])
 
     if key is None:
         return http.JsonResponse({"error": True, "message": "Invalid key."}, status=400)
