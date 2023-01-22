@@ -5,9 +5,14 @@ import time
 from django import http
 from django.core import mail
 from django.template import loader
+
 import user_agents
-from ..utils import misc, logs
+import requests
+
+from lightningbot import settings
+
 from ..models import User, PasswordResetToken
+from ..utils import misc, logs
 
 
 def create_password_reset_token(user: User) -> PasswordResetToken:
@@ -71,16 +76,28 @@ def send_reset_password_email(request: http.HttpRequest, user: User) -> bool:
         },
     )
 
-    message = mail.EmailMessage(
-        "LightningBot - Password Reset",
-        email_html,
-        "LightningBot <password-reset@lightning-bot.com>",
-        [user.email],
+    email_data = {
+        "to": [{"email": user.email, "name": user.username}],
+        "from": {
+            "email": "lightning@lightning-bot.com",
+            "name": "LightningBot",
+        },
+        "subject": "LightningBot - Password Reset",
+        "content": [{"type": "text/html", "value": email_html}],
+    }
+
+    json_data = {"personalizations": [email_data]}
+
+    response = requests.post(
+        "https://api.sendgrid.com/v3/mail/send",
+        headers={
+            "Authorization": f"Bearer {settings.SENDGRID_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        json=json_data,
     )
 
-    message.content_subtype = "html"
-
-    message.send()
+    print(response.status_code, response.text)
 
     logs.create_entry(log_type="send_reset_password_email", user=user, info={})
 
