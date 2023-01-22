@@ -99,8 +99,13 @@ def send_reset_password_email(request: http.HttpRequest, user: User) -> bool:
         json=json_data,
     )
 
-    print(response.status_code, response.text)
+    logs.create_entry(
+        log_type="send_reset_password_email",
+        user=user,
+        info={
+            "response_code": response.status_code,
+            "response_body": response.text,
+        },
+    )
 
-    logs.create_entry(log_type="send_reset_password_email", user=user, info={})
-
-    return True
+    return response.status_code == 202
