@@ -19,11 +19,12 @@ def create_key(user: User = None, key=None, create_reason="", created_by="") -> 
     Create a key
     """
     key = Key.objects.create(
-        user=user,
         key=key or _generate_key(),
-        create_reason=create_reason,
         created_by=created_by,
+        create_reason=create_reason,
+        redeemed_by=user,
     )
+    
     if user:
         user.redeemed_key = key
         user.account_type = "Premium"
