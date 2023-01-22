@@ -76,8 +76,12 @@ def send_reset_password_email(request: http.HttpRequest, user: User) -> bool:
         },
     )
 
-    email_data = {
-        "to": [{"email": user.email, "name": user.username}],
+    json_data = {
+        "personalizations": [
+            {
+                "to": [{"email": user.email, "name": user.username}],
+            }
+        ],
         "from": {
             "email": "lightning@lightning-bot.com",
             "name": "LightningBot",
@@ -85,8 +89,6 @@ def send_reset_password_email(request: http.HttpRequest, user: User) -> bool:
         "subject": "LightningBot - Password Reset",
         "content": [{"type": "text/html", "value": email_html}],
     }
-
-    json_data = {"personalizations": [email_data]}
 
     response = requests.post(
         "https://api.sendgrid.com/v3/mail/send",
