@@ -5,6 +5,7 @@ import time
 from django import http
 from api.utils import keys, releases, logs
 
+
 # POST /api/v3/selfbot/reset-hwid
 def reset_hwid(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -39,6 +40,17 @@ def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
     Redeem a license key
     """
     key = keys.get_key_if_unredeemed(request.POST["key"])
+    captcha_token: str = request.POST["captcha_token"]
+
+    if not validation.validate_captcha(request, captcha_token):
+        return http.JsonResponse(
+            {
+                "status": 400,
+                "error": "INVALID_CAPTCHA",
+                "message": "Invalid captcha response.",
+            },
+            status=400,
+        )
 
     if key is None:
         return http.JsonResponse({"error": True, "message": "Invalid key."}, status=400)

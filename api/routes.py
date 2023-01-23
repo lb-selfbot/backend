@@ -52,7 +52,7 @@ class Route:
         """
         Get the Django path for this route
         """
-        
+
         return path(self.route, csrf_exempt(self.view), name=self.name)
 
 
@@ -119,7 +119,7 @@ routes = [
         views.auth.register,
         name="Register",
         methods=["POST"],
-        required_json_fields=["str:username", "str:password", "str:captcha"],
+        required_json_fields=["str:username", "str:password", "str:captcha_token"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
     Route(
@@ -132,6 +132,7 @@ routes = [
             "str:password",
             "bool:session",
             "bool:rememberme",
+            "str:captcha_token"
         ],
         flags=RouteFlags.JSON_REQUIRED,
     ),
@@ -147,7 +148,7 @@ routes = [
         views.auth.forgot_password,
         name="Forgot Password",
         methods=["POST"],
-        required_json_fields=["str:username"],
+        required_json_fields=["str:username", "str:captcha_token"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
     Route(
@@ -155,7 +156,7 @@ routes = [
         views.auth.reset_password,
         name="Reset Password",
         methods=["POST"],
-        required_json_fields=["str:username", "str:new_password", "str:token"],
+        required_json_fields=["str:username", "str:new_password", "str:token", "str:captcha_token"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
     Route(
@@ -206,7 +207,7 @@ routes = [
         views.selfbot.redeem_key,
         name="Redeem Key",
         methods=["POST"],
-        required_json_fields=["str:key"],
+        required_json_fields=["str:key", "str:captcha_token"],
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
     ),
     Route(
@@ -223,7 +224,8 @@ routes = [
         views.paypal.create_order,
         name="Create Order",
         methods=["POST"],
-        flags=RouteFlags.LOGIN_REQUIRED,
+        required_json_fields=["str:captcha_token"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/paypal/capture-order",
@@ -248,8 +250,8 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:version", "str:branch", "str:changelog"],
         flags=RouteFlags.LOGIN_REQUIRED
-        | RouteFlags.ADMIN_REQUIRED
-        | RouteFlags.JSON_REQUIRED,
+              | RouteFlags.ADMIN_REQUIRED
+              | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/delete-release",
@@ -258,8 +260,8 @@ routes = [
         methods=["POST"],
         required_json_fields=["int:release_id"],
         flags=RouteFlags.LOGIN_REQUIRED
-        | RouteFlags.ADMIN_REQUIRED
-        | RouteFlags.JSON_REQUIRED,
+              | RouteFlags.ADMIN_REQUIRED
+              | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/table-data/users",
@@ -303,8 +305,8 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:action", "int:user_id", "str:data"],
         flags=RouteFlags.LOGIN_REQUIRED
-        | RouteFlags.ADMIN_REQUIRED
-        | RouteFlags.JSON_REQUIRED,
+              | RouteFlags.ADMIN_REQUIRED
+              | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/action/key",
@@ -313,8 +315,8 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:action", "int:key_id"],
         flags=RouteFlags.LOGIN_REQUIRED
-        | RouteFlags.ADMIN_REQUIRED
-        | RouteFlags.JSON_REQUIRED,
+              | RouteFlags.ADMIN_REQUIRED
+              | RouteFlags.JSON_REQUIRED,
     ),
     # Discord Bot
     Route(

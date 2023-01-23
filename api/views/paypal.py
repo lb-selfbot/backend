@@ -7,11 +7,24 @@ from paypalhttp import HttpError
 
 from api.utils.paypal_sdk import paypal_sdk
 
+
 # GET /api/v3/paypal/create_order
-def create_order(_request: http.HttpRequest) -> http.HttpResponse:
+def create_order(request: http.HttpRequest) -> http.HttpResponse:
     """
     Create a PayPal order
     """
+    captcha_token: str = request.POST["captcha_token"]
+
+    if not validation.validate_captcha(request, captcha_token):
+        return http.JsonResponse(
+            {
+                "status": 400,
+                "error": "INVALID_CAPTCHA",
+                "message": "Invalid captcha response.",
+            },
+            status=400,
+        )
+
     try:
         order_id = paypal_sdk.create_order()
     except HttpError as http_error:

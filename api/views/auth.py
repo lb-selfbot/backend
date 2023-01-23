@@ -7,10 +7,12 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 
-from ..utils import validation, logs
+from ..utils import password_reset
+from ..utils import validation
 from ..utils import errors
 from ..utils import stats
-from ..utils import password_reset
+from ..utils import logs
+
 from ..models import User
 
 
@@ -21,9 +23,9 @@ def register(request: http.HttpRequest) -> http.HttpResponse:
     """
     username: str = request.POST["username"]
     password: str = request.POST["password"]
-    captcha: str = request.POST["captcha"]
+    captcha_token: str = request.POST["captcha_token"]
 
-    if not validation.validate_captcha(request, captcha):
+    if not validation.validate_captcha(request, captcha_token):
         return http.JsonResponse(
             {
                 "status": 400,
@@ -72,7 +74,7 @@ def register(request: http.HttpRequest) -> http.HttpResponse:
                     "status": 400,
                     "error": validation_error_str,
                     "message": "Username must include only letters,"
-                    + " numbers, underscores and periods.",
+                               + " numbers, underscores and periods.",
                 },
                 status=400,
             )
@@ -114,6 +116,17 @@ def login(request: http.HttpRequest) -> http.HttpResponse:
     password: str = request.POST["password"]
     session = bool(request.POST["session"])
     rememberme = bool(request.POST["rememberme"])
+    captcha_token: str = request.POST["captcha_token"]
+
+    if not validation.validate_captcha(request, captcha_token):
+        return http.JsonResponse(
+            {
+                "status": 400,
+                "error": "INVALID_CAPTCHA",
+                "message": "Invalid captcha response.",
+            },
+            status=400,
+        )
 
     user = auth.authenticate(request, username=username, password=password)
 
@@ -153,7 +166,18 @@ def forgot_password(request: http.HttpRequest) -> http.HttpResponse:
     """
     Send a password reset email
     """
-    username = request.POST["username"]
+    username: str = request.POST["username"]
+    captcha_token: str = request.POST["captcha_token"]
+
+    if not validation.validate_captcha(request, captcha_token):
+        return http.JsonResponse(
+            {
+                "status": 400,
+                "error": "INVALID_CAPTCHA",
+                "message": "Invalid captcha response.",
+            },
+            status=400,
+        )
 
     try:
         user = User.objects.get(username=username)
@@ -187,9 +211,20 @@ def reset_password(request: http.HttpRequest) -> http.HttpResponse:
     """
     Reset password
     """
-    username = request.POST["username"]
-    new_password = request.POST["new_password"]
-    token = request.POST["token"]
+    username: str = request.POST["username"]
+    new_password: str = request.POST["new_password"]
+    token: str = request.POST["token"]
+    captcha_token: str = request.POST["captcha_token"]
+
+    if not validation.validate_captcha(request, captcha_token):
+        return http.JsonResponse(
+            {
+                "status": 400,
+                "error": "INVALID_CAPTCHA",
+                "message": "Invalid captcha response.",
+            },
+            status=400,
+        )
 
     try:
         user = User.objects.get(username=username)
