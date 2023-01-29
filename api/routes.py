@@ -96,6 +96,30 @@ routes = [
         methods=["GET"],
     ),
     Route(
+        "v3/misc/breaking-bad-quote",
+        views.misc.breaking_bad_quote,
+        name="Breaking Bad Quote",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/misc/game-of-thrones-quote",
+        views.misc.game_of_thrones_quote,
+        name="Game of Thrones quote",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/misc/lucifer-quote",
+        views.misc.lucifer_quote,
+        name="Lucifer quote",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/misc/stranger-things-quote",
+        views.misc.stranger_things_quote,
+        name="Stranger Things quote",
+        methods=["GET"],
+    ),
+    Route(
         "v3/misc/search",
         views.misc.search,
         name="Google Search",

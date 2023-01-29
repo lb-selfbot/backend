@@ -67,6 +67,50 @@ def topic(_request: http.HttpRequest) -> http.HttpResponse:
     return http.JsonResponse({"status": 200, "topic": random.choice(topics_list)})
 
 
+# /api/v3/misc/breaking-bad-quote
+def breaking_bad_quote(_request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Random Breaking Bad quote
+    """
+    with open("./data/breakingbadquotes.json", "r", encoding="utf8") as file:
+        quotes_list: typing.List = json.load(file)
+
+    return http.JsonResponse({"status": 200, **random.choice(quotes_list)})
+
+
+# /api/v3/misc/game-of-thrones-quote
+def game_of_thrones_quote(_request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Random Game of Thrones quote
+    """
+    with open("./data/gameofthronesquotes.json", "r", encoding="utf8") as file:
+        quotes_list: typing.List = json.load(file)
+
+    return http.JsonResponse({"status": 200, **random.choice(quotes_list)})
+
+
+# /api/v3/misc/lucifer-quote
+def lucifer_quote(_request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Random Lucifer quote
+    """
+    with open("./data/luciferquotes.json", "r", encoding="utf8") as file:
+        quotes_list: typing.List = json.load(file)
+
+    return http.JsonResponse({"status": 200, **random.choice(quotes_list)})
+
+
+# /api/v3/misc/stranger-things-quote
+def stranger_things_quote(_request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Random Lucifer quote
+    """
+    with open("./data/strangerthingsquotes.json", "r", encoding="utf8") as file:
+        quotes_list: typing.List = json.load(file)
+
+    return http.JsonResponse({"status": 200, **random.choice(quotes_list)})
+
+
 # /api/v3/misc/search
 def search(request: http.HttpRequest) -> http.HttpResponse:
     """
