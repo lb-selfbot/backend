@@ -242,6 +242,12 @@ routes = [
         required_json_fields=["str:branch", "str:version"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/start-params",
+        views.selfbot.start_params,
+        name="Start Params",
+        methods=["POST"],
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",

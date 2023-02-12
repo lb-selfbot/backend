@@ -2,8 +2,15 @@
 Selfbot API views
 """
 import time
+import base64
+import hashlib
+
 from django import http
+
 from api.utils import keys, releases, logs, validation
+from api.utils.encryption import Encryption
+
+encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
 
 
 # POST /api/v3/selfbot/reset-hwid
@@ -97,4 +104,35 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
                 "changelog": latest_release.changelog,
             },
         }
+    )
+
+
+# POST /api/v3/selfbot/start-params
+def start_params(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Check start params
+    """
+
+    data = {
+        "status": "ok",
+    }
+
+    encrypted = encryption.encrypt(data)
+
+    hashed: bytes = hashlib.sha512(encrypted.encode("ascii")).digest()
+
+    new_hash = bytearray()
+
+    for i, hash_byte in enumerate(hashed):
+        if i % 2 == 0:
+            continue
+
+        new_hash.append(hash_byte ^ i)
+
+    return http.HttpResponse(
+        encrypted,
+        content_type="application/octet-stream",
+        headers={
+            "cf-ray-id": base64.b64encode(new_hash).decode("ascii"),
+        },
     )
