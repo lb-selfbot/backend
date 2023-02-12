@@ -2,6 +2,7 @@
 Selfbot API views
 """
 import time
+import json
 import base64
 import hashlib
 
@@ -117,9 +118,11 @@ def start_params(request: http.HttpRequest) -> http.HttpResponse:
         "status": "ok",
     }
 
-    encrypted = encryption.encrypt(data)
+    data_string = json.dumps(data)
 
-    hashed: bytes = hashlib.sha512(encrypted.encode("ascii")).digest()
+    encrypted = encryption.encrypt(data_string)
+
+    hashed: bytes = hashlib.sha512(data_string.encode("ascii")).digest()
 
     new_hash = bytearray()
 
