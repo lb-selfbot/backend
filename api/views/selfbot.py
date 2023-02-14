@@ -6,6 +6,7 @@ import json
 import base64
 import hashlib
 
+import requests
 from django import http
 
 from api.utils import keys, releases, logs, validation
@@ -109,7 +110,7 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/start-params
-def start_params(request: http.HttpRequest) -> http.HttpResponse:
+def start_params(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Check start params
     """
@@ -139,3 +140,59 @@ def start_params(request: http.HttpRequest) -> http.HttpResponse:
             "cf-ray-id": base64.b64encode(new_hash).decode("ascii"),
         },
     )
+
+discord_headers = {
+    "accept": "*/*",
+    "accept-language": "en-US,nl-NL;q=0.9",
+    "authorization": "Bot MTA0MTMwMjcxMTc1MDExOTUwNA.G9V-JK.2-r-eEJZqZeFBV6WcTHAGNop71y9v2kDrpOyJk",
+    "content-type": "application/json",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "x-debug-options": "bugReporterEnabled",
+    "x-discord-locale": "en-US",
+}
+
+# POST /api/v3/selfbot/gen-image-key
+def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Generate an image key
+    """
+    image_url = request.POST["image_url"]
+
+    try:
+        response = requests.post(
+        "https://discord.com/api/v9/channels/1070776322449748129/messages",
+        json={
+            "embeds": [
+                {
+                    "type": "rich",
+                    "description": "",
+                    "thumbnail": {"url": image_url},
+                },
+            ],
+            "tts": False,
+        },
+        headers=discord_headers,
+        timeout=10,
+    )
+    except requests.exceptions.RequestException:
+        return http.JsonResponse(
+            {"error": True, "reason": "Failed to connect to Discord"}, status=500
+        )
+    
+    if response.status_code != 200:
+        return http.JsonResponse(
+            {"error": True, "reason": "Failed to connect to Discord"}, status=500
+        )
+    
+    try:
+        proxy_url = str(response.json()["embeds"][0]["thumbnail"]["proxy_url"])
+    except KeyError:
+        return http.JsonResponse(
+            {"error": True, "reason": "Failed to connect to Discord"}, status=500
+        )
+
+    image_key = "mp:external/" + proxy_url.split("external/")[-1]
+    
+    return http.JsonResponse({"error": False, "image_key": image_key})

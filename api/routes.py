@@ -248,6 +248,14 @@ routes = [
         name="Start Params",
         methods=["POST"],
     ),
+    Route(
+        "v3/selfbot/gen-image-key",
+        views.selfbot.gen_image_key,
+        name="Gen Image Key",
+        methods=["POST"],
+        required_json_fields=["str:image_url"],
+        flags=RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",
