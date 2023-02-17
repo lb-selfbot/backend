@@ -8,6 +8,8 @@ import typing
 import random
 import string
 
+from datetime import datetime
+
 from django.utils import timezone
 from django.contrib import auth
 from asgiref.sync import async_to_sync
@@ -139,6 +141,8 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         Called when a WebSocket JSON message is received
         """
+        print(datetime.now(), "received from", self.django_user, json_message)
+
         json_data = json_message.get("data", {})
         match json_message.get("op"):
             case "HELLO":
