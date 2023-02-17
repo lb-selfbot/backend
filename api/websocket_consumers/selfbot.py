@@ -189,10 +189,18 @@ class SelfbotConsumer(WebsocketConsumer):
                     info={},
                 )
             case "PING":
+                # Get the user again so there are no race conditions
+                # where the user redeems a key or changes their account
+                # while the selfbot is connected, but we save and old
+                # version of the user so all changes are lost
+                self.django_user = User.objects.get(id=self.django_user.id)
+
                 # Add 1 minute to login time
                 self.django_user.login_time += 60
                 self.django_user.last_selfbot_ping = timezone.now()
+
                 self.django_user.save()
+
                 self.send_to_selfbot({"op": "PONG"})
             case "CONSOLE_APPEND" | "CONSOLE_CLEAR" | "CONSOLE_SET" | "CONFIG_UPDATE":
                 # Generic case to relay message to website
