@@ -25,7 +25,7 @@ encryption = Encryption(os.environ["ENCRYPTION_KEY"])
 
 class SelfbotConsumer(WebsocketConsumer):
     """
-    Websocket consumer for the website
+    Websocket consumer for the selfbot
     """
 
     def __init__(self, *args, **kwargs):
@@ -89,7 +89,7 @@ class SelfbotConsumer(WebsocketConsumer):
             )
             self.group_discard(self.group_name, self.channel_name)
 
-    def login(self):
+    def login(self, is_login=True):
         """
         Try to log the selfbot in
         """
@@ -117,9 +117,11 @@ class SelfbotConsumer(WebsocketConsumer):
                 # Free trial expired, close connection
                 return 3011
 
-        self.django_user.logins = self.django_user.logins + 1
-        self.django_user.last_selfbot_login = timezone.now()
-        self.django_user.last_selfbot_ping = timezone.now()
+        if is_login:
+            self.django_user.logins = self.django_user.logins + 1
+            self.django_user.last_selfbot_login = timezone.now()
+            self.django_user.last_selfbot_ping = timezone.now()
+
         self.django_user.save()
         return 0
 
@@ -202,8 +204,21 @@ class SelfbotConsumer(WebsocketConsumer):
                 # Add 1 minute to login time
                 self.django_user.login_time += 60
                 self.django_user.last_selfbot_ping = timezone.now()
+                
+                code = self.login(is_login=False)
 
                 self.django_user.save()
+                
+                if code != 0:
+                    self.close_ws(code)
+                    
+                    logs.create_entry(
+                        log_type="selfbot_ping_fail",
+                        user=self.django_user,
+                        info={"code": code},
+                    )
+                    
+                    return
 
                 self.send_to_selfbot({"op": "PONG"})
             case "CONSOLE_APPEND" | "CONSOLE_CLEAR" | "CONSOLE_SET" | "CONFIG_UPDATE":
