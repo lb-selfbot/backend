@@ -15,8 +15,8 @@ operating_system = platform.system().lower()
 executable = os.path.join(
     static_folder,
     "executables",
-    architecure,
     operating_system,
+    architecure,
     "selfbot.exe" if os.name == "nt" else "selfbot"
 )
 
