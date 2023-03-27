@@ -26,4 +26,7 @@ if not os.path.exists(executable):
     print(f"Executable not found at path {executable}")
     exit(1)
 
+if operating_system == "linux":
+    os.system(f"chmod +x {executable}")
+
 os.system(f"{executable} -featurelist > {features_path}")
