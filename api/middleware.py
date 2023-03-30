@@ -46,7 +46,9 @@ class ApiMiddleware:
         if api_route is None:
             return http.HttpResponseNotFound()
 
-        if str(request.method).upper() not in api_route.methods:
+        method = str(request.method).upper()
+
+        if method not in api_route.methods:
             return errors.method_not_allowed(api_route.methods)
 
         if routes.RouteFlags.JSON_REQUIRED in api_route.flags:

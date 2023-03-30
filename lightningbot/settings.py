@@ -202,20 +202,12 @@ ALLOWED_HOSTS = [
     "transcripts.lightning-bot.com",
     "api.lightning-bot.com",
     "lightning-bot.com",
-    "transcripts.lightningdev.tech",
-    "api.lightningdev.tech",
-    "lightningdev.tech",
-    "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
     "https://transcripts.lightning-bot.com",
     "https://api.lightning-bot.com",
     "https://lightning-bot.com",
-    "https://transcripts.lightningdev.tech",
-    "https://api.lightningdev.tech",
-    "https://lightningdev.tech",
-    "http://localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
