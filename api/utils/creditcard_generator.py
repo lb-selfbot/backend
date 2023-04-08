@@ -78,5 +78,5 @@ class CreditCardGenerator:
         return {
             "number": self.completed_number(prefix, length),
             "ccv": self.random_int(100, 999, 3),
-            "expiry": f"{self.random_int(1, 12, 2)}/{self.random_int(23, 30, 2)}",
+            "expiry_date": f"{self.random_int(1, 12, 2)}/{self.random_int(23, 30, 2)}",
         }
