@@ -59,6 +59,7 @@ def validate_captcha(request: http.HttpRequest, captcha_response: str) -> bool:
         info={
             "result": json,
             "accepted": accepted,
+            "url": request.build_absolute_uri(),
         },
     )
 
