@@ -9,6 +9,7 @@ import requests
 
 from api.models import User
 from .misc import get_user_ip
+import logs
 
 
 class ValidationResult:
@@ -27,7 +28,7 @@ class ValidationResult:
         return int(self)
 
     @staticmethod
-    def to_string(validation_result: 'ValidationResult') -> str:
+    def to_string(validation_result: "ValidationResult") -> str:
         """
         Convert a validation error to a string
         """
@@ -47,9 +48,21 @@ def validate_captcha(request: http.HttpRequest, captcha_response: str) -> bool:
         },
         timeout=5,
     )
-    
+
     json = response.json()
-    return json["success"] and json["score"] >= 0.5
+
+    accepted = json["success"] and json["score"] >= 0.4
+
+    logs.create_entry(
+        log_type="captcha_validation",
+        user=request.user,
+        info={
+            "result": json,
+            "accepted": accepted,
+        },
+    )
+
+    return accepted
 
 
 def validate_user(username: str, password: str) -> ValidationResult:
