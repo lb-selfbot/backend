@@ -11,6 +11,10 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+from clyde_bot.bot import run_clyde_bot
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lightningbot.settings')
+
+run_clyde_bot()
 
 application = get_wsgi_application()

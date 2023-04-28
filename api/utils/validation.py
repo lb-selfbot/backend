@@ -9,7 +9,7 @@ import requests
 
 from api.models import User
 from .misc import get_user_ip
-import logs
+from . import logs
 
 
 class ValidationResult:

@@ -256,6 +256,14 @@ routes = [
         required_json_fields=["str:image_url"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/clyde",
+        views.selfbot.clyde,
+        name="Clyde",
+        methods=["POST"],
+        required_json_fields=["str:message"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",

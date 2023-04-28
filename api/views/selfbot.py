@@ -4,6 +4,7 @@ Selfbot API views
 import time
 import json
 import base64
+import asyncio
 import hashlib
 
 import requests
@@ -11,6 +12,7 @@ from django import http
 
 from api.utils import keys, releases, logs, validation
 from api.utils.encryption import Encryption
+from clyde_bot.bot import ClydeJob, clyde_bot
 
 encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
 
@@ -141,6 +143,7 @@ def start_params(_request: http.HttpRequest) -> http.HttpResponse:
         },
     )
 
+
 discord_headers = {
     "accept": "*/*",
     "accept-language": "en-US,nl-NL;q=0.9",
@@ -153,6 +156,7 @@ discord_headers = {
     "x-discord-locale": "en-US",
 }
 
+
 # POST /api/v3/selfbot/gen-image-key
 def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -162,30 +166,30 @@ def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
 
     try:
         response = requests.post(
-        "https://discord.com/api/v9/channels/1070776322449748129/messages",
-        json={
-            "embeds": [
-                {
-                    "type": "rich",
-                    "description": "",
-                    "thumbnail": {"url": image_url},
-                },
-            ],
-            "tts": False,
-        },
-        headers=discord_headers,
-        timeout=10,
-    )
+            "https://discord.com/api/v9/channels/1070776322449748129/messages",
+            json={
+                "embeds": [
+                    {
+                        "type": "rich",
+                        "description": "",
+                        "thumbnail": {"url": image_url},
+                    },
+                ],
+                "tts": False,
+            },
+            headers=discord_headers,
+            timeout=10,
+        )
     except requests.exceptions.RequestException:
         return http.JsonResponse(
             {"error": True, "reason": "Failed to connect to Discord"}, status=500
         )
-    
+
     if response.status_code != 200:
         return http.JsonResponse(
             {"error": True, "reason": "Failed to connect to Discord"}, status=500
         )
-    
+
     try:
         proxy_url = str(response.json()["embeds"][0]["thumbnail"]["proxy_url"])
     except KeyError:
@@ -194,5 +198,30 @@ def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
         )
 
     image_key = "mp:external/" + proxy_url.split("external/")[-1]
-    
+
     return http.JsonResponse({"error": False, "image_key": image_key})
+
+
+from asgiref.sync import async_to_sync
+
+
+# POST /api/v3/selfbot/clyde
+def clyde(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Generate a Clyde (OpenAI) response
+    """
+    try:
+        message = request.POST["message"]
+
+        job = ClydeJob(request.user.username, message)
+
+        clyde_bot.tasks.sync_q.put(job)
+
+        response, error = clyde_bot.wait_for_response(job)
+
+        if error:
+            return http.JsonResponse({"error": True, "reason": response}, status=500)
+
+        return http.JsonResponse({"error": False, "response": response})
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
