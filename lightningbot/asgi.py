@@ -19,11 +19,11 @@ from clyde_bot.bot import run_clyde_bot
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lightningbot.settings")
 
-import api.urls
+django_app = get_asgi_application()
 
 run_clyde_bot()
 
-django_app = get_asgi_application()
+import api.urls
 
 application = ProtocolTypeRouter(
     {
