@@ -13,3 +13,5 @@ psutil
 pillow
 mysqlclient
 bcrypt
+git+https://github.com/dolfies/discord.py-self
+janus
