@@ -53,9 +53,10 @@ def validate_captcha(request: http.HttpRequest, captcha_response: str) -> bool:
 
     accepted = json["success"] and json["score"] >= 0.4
 
+
     logs.create_entry(
         log_type="captcha_validation",
-        user=request.user,
+        user=request.user if request.user.is_authenticated else None,
         info={
             "result": json,
             "accepted": accepted,
