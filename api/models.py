@@ -35,6 +35,9 @@ class PasswordResetToken(models.Model):
     token = models.CharField(max_length=255)
     created_at = models.BigIntegerField(default=0)
 
+    def __str__(self):
+        return f"{self.user.username} - {self.token}"
+
 
 class Order(models.Model):
     """
@@ -47,6 +50,9 @@ class Order(models.Model):
     key = models.CharField(max_length=255, default="")
     raw_json = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.order_id} - {self.status}"
 
 
 class Key(models.Model):
@@ -62,6 +68,9 @@ class Key(models.Model):
         User, on_delete=models.SET_NULL, null=True, blank=True
     )
 
+    def __str__(self):
+        return f"{self.key} - {self.redeemed_by.username if self.redeemed_by else 'Unredeemed'}"
+
 
 class Transcript(models.Model):
     """
@@ -70,6 +79,9 @@ class Transcript(models.Model):
 
     html = models.TextField(default="")
     code = models.CharField(max_length=255, default="")
+
+    def __str__(self):
+        return self.code
 
 
 class Release(models.Model):
@@ -82,6 +94,9 @@ class Release(models.Model):
     changelog = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.version} - {self.branch}"
+
 
 class Log(models.Model):
     """
@@ -92,3 +107,6 @@ class Log(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     info = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.log_type} - {self.user.username if self.user else 'No user'}"
