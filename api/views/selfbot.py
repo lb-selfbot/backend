@@ -9,8 +9,10 @@ import hashlib
 
 import requests
 import pytesseract
-from django import http
 from PIL import Image
+from io import BytesIO
+from django import http
+
 
 from api.utils import keys, releases, logs, validation
 from api.utils.encryption import Encryption
@@ -239,15 +241,15 @@ def ocr(request: http.HttpRequest) -> http.HttpResponse:
             return http.JsonResponse(
                 {"error": True, "reason": "Invalid image link"}, status=400
             )
-        
+
         if not image_link.endswith((".png", ".jpg", ".jpeg", ".gif")):
             return http.JsonResponse(
                 {"error": True, "reason": "Invalid image link"}, status=400
             )
-        
+
         image = requests.get(image_link, timeout=5).content
 
-        image = Image.open(image)
+        image = Image.open(BytesIO(image))
 
         extracted_text = pytesseract.image_to_string(image)
 
