@@ -269,8 +269,7 @@ routes = [
         views.selfbot.ocr,
         name="Clyde",
         methods=["POST"],
-        required_json_fields=["str:message"],
-        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+        flags=RouteFlags.LOGIN_REQUIRED,
     ),
     # PayPal
     Route(
