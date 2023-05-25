@@ -264,6 +264,14 @@ routes = [
         required_json_fields=["str:message"],
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/ocr",
+        views.selfbot.ocr,
+        name="Clyde",
+        methods=["POST"],
+        required_json_fields=["str:message"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",

@@ -8,7 +8,9 @@ import asyncio
 import hashlib
 
 import requests
+import pytesseract
 from django import http
+from PIL import Image
 
 from api.utils import keys, releases, logs, validation
 from api.utils.encryption import Encryption
@@ -202,9 +204,6 @@ def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
     return http.JsonResponse({"error": False, "image_key": image_key})
 
 
-from asgiref.sync import async_to_sync
-
-
 # POST /api/v3/selfbot/clyde
 def clyde(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -223,5 +222,27 @@ def clyde(request: http.HttpRequest) -> http.HttpResponse:
             return http.JsonResponse({"error": True, "reason": response}, status=500)
 
         return http.JsonResponse({"error": False, "response": response})
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
+
+# POST /api/v3/selfbot/ocr
+def ocr(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Extract text from an image
+    """
+    try:
+        image = request.FILES.get("image", None)
+
+        if image is None:
+            return http.JsonResponse(
+                {"error": True, "reason": "No image provided"}, status=400
+            )
+
+        image = Image.open(image)
+
+        extracted_text = pytesseract.image_to_string(image)
+
+        return http.JsonResponse({"error": False, "text": extracted_text})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
