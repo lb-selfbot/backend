@@ -232,12 +232,20 @@ def ocr(request: http.HttpRequest) -> http.HttpResponse:
     Extract text from an image
     """
     try:
-        image = request.FILES.get("image", None)
+        image_link = request.POST["image"]
 
-        if image is None:
+        # validate image
+        if not image_link.startswith("http"):
             return http.JsonResponse(
-                {"error": True, "reason": "No image provided"}, status=400
+                {"error": True, "reason": "Invalid image link"}, status=400
             )
+        
+        if not image_link.endswith((".png", ".jpg", ".jpeg", ".gif")):
+            return http.JsonResponse(
+                {"error": True, "reason": "Invalid image link"}, status=400
+            )
+        
+        image = requests.get(image_link, timeout=5).content
 
         image = Image.open(image)
 
