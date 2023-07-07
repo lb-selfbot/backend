@@ -201,6 +201,7 @@ SERVER_EMAIL = "server@lightning-bot.com"
 ALLOWED_HOSTS = [
     "transcripts.lightning-bot.com",
     "api.lightning-bot.com",
+    "beta-api.lightning-bot.com",
     "lightning-bot.com",
     "localhost",
 ]
@@ -208,6 +209,7 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
     "https://transcripts.lightning-bot.com",
     "https://api.lightning-bot.com",
+    "https://beta-api.lightning-bot.com",
     "https://lightning-bot.com",
     "http://localhost:3000",
 ]
