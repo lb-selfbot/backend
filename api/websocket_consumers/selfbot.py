@@ -16,6 +16,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 from ..utils import logs
+from ..utils import console
 from ..utils.encryption import Encryption
 
 from ..models import User
@@ -40,6 +41,10 @@ class SelfbotConsumer(WebsocketConsumer):
 
         self.instance_id = random.choices(string.ascii_letters + string.digits, k=50)
 
+    @property
+    def console_html(self):
+        return console.ansi_to_html(self.console_text)
+
     def group_add(self, group_name: str, channel_name: str):
         """
         Sync version of self.channel_layer.group_add
@@ -63,6 +68,18 @@ class SelfbotConsumer(WebsocketConsumer):
         Send a message to the selfbot websocket
         """
         self.send(encryption.encrypt(message), close=close)
+
+    def relay_to_website(self, message: typing.Dict[str, any]):
+        """
+        Relay a message to the website websocket
+        """
+        self.group_send(
+            self.group_name,
+            {
+                "type": "selfbot_to_website_relay",
+                "data": message,
+            },
+        )
 
     def close_ws(self, code: int):
         """
@@ -197,39 +214,60 @@ class SelfbotConsumer(WebsocketConsumer):
             case "PING":
                 # Get the user again so there are no race conditions
                 # where the user redeems a key or changes their account
-                # while the selfbot is connected, but we save and old
+                # while the selfbot is connected, but we save an old
                 # version of the user so all changes are lost
                 self.django_user = User.objects.get(id=self.django_user.id)
 
                 # Add 1 minute to login time
                 self.django_user.login_time += 60
                 self.django_user.last_selfbot_ping = timezone.now()
-                
+
                 code = self.login(is_login=False)
 
                 self.django_user.save()
-                
+
                 if code != 0:
                     self.close_ws(code)
-                    
+
                     logs.create_entry(
                         log_type="selfbot_ping_fail",
                         user=self.django_user,
                         info={"code": code},
                     )
-                    
+
                     return
 
                 self.send_to_selfbot({"op": "PONG"})
-            case "CONSOLE_APPEND" | "CONSOLE_CLEAR" | "CONSOLE_SET" | "CONFIG_UPDATE":
-                # Generic case to relay message to website
-                self.group_send(
-                    self.group_name,
+            case "CONSOLE_APPEND":
+                text = json_data.get("text", "") + "\n"
+                self.console_text += text
+
+                self.relay_to_website(
                     {
-                        "type": "selfbot_to_website_relay",
-                        "data": json_message,
-                    },
+                        "op": "CONSOLE_APPEND",
+                        "data": {
+                            "text": console.ansi_to_html(text),
+                        },
+                    }
                 )
+            case "CONSOLE_CLEAR":
+                self.console_text = ""
+
+                self.relay_to_website(json_message)
+            case "CONSOLE_SET":
+                self.console_text = json_data.get("text", "")
+
+                self.relay_to_website(
+                    {
+                        "op": "CONSOLE_APPEND",
+                        "data": {
+                            "text": self.console_html,
+                        },
+                    }
+                )
+            case "CONFIG_UPDATE":
+                # Generic case to relay message to website
+                self.relay_to_website(json_message)
 
     def selfbot_connect(self, event):
         """
@@ -263,7 +301,7 @@ class SelfbotConsumer(WebsocketConsumer):
                 "type": "selfbot_connect",
                 "channel_name": self.channel_name,
                 "computer_name": self.computer_name,
-                "console_text": self.console_text,
+                "console_text": self.console_html,
             },
         )
         self.send_to_selfbot({"op": "WEBSITE_CONNECT"})
