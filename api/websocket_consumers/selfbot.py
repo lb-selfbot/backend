@@ -199,7 +199,14 @@ class SelfbotConsumer(WebsocketConsumer):
                     },
                 )
 
-                self.send_to_selfbot({"op": "HELLO_ACK"})
+                self.send_to_selfbot(
+                    {
+                        "op": "HELLO_ACK",
+                        "data": {
+                            "nonce": json_data.get("nonce", ""),
+                        },
+                    }
+                )
 
                 logs.create_entry(
                     log_type="selfbot_connect",
