@@ -6,7 +6,7 @@ from functools import cache
 import ansi2html
 
 
-conv = ansi2html.Ansi2HTMLConverter()
+conv = ansi2html.Ansi2HTMLConverter(inline=True)
 
 
 @cache
