@@ -16,4 +16,3 @@ bcrypt
 git+https://github.com/dolfies/discord.py-self
 janus
 pytesseract
-ansi2html

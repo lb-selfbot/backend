@@ -16,7 +16,6 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 from ..utils import logs
-from ..utils import console
 from ..utils.encryption import Encryption
 
 from ..models import User
@@ -40,10 +39,6 @@ class SelfbotConsumer(WebsocketConsumer):
         self.console_text: str = None
 
         self.instance_id = random.choices(string.ascii_letters + string.digits, k=50)
-
-    @property
-    def console_html(self):
-        return console.ansi_to_html(self.console_text)
 
     def group_add(self, group_name: str, channel_name: str):
         """
@@ -239,17 +234,9 @@ class SelfbotConsumer(WebsocketConsumer):
 
                 self.send_to_selfbot({"op": "PONG"})
             case "CONSOLE_APPEND":
-                text = json_data.get("text", "") + "\n"
-                self.console_text += text
+                self.console_text += json_data.get("text", "")
 
-                self.relay_to_website(
-                    {
-                        "op": "CONSOLE_APPEND",
-                        "data": {
-                            "text": console.ansi_to_html(text),
-                        },
-                    }
-                )
+                self.relay_to_website(json_message)
             case "CONSOLE_CLEAR":
                 self.console_text = ""
 
@@ -257,14 +244,7 @@ class SelfbotConsumer(WebsocketConsumer):
             case "CONSOLE_SET":
                 self.console_text = json_data.get("text", "")
 
-                self.relay_to_website(
-                    {
-                        "op": "CONSOLE_SET",
-                        "data": {
-                            "text": self.console_html,
-                        },
-                    }
-                )
+                self.relay_to_website(json_message)
             case "CONFIG_UPDATE":
                 # Generic case to relay message to website
                 self.relay_to_website(json_message)
@@ -301,7 +281,7 @@ class SelfbotConsumer(WebsocketConsumer):
                 "type": "selfbot_connect",
                 "channel_name": self.channel_name,
                 "computer_name": self.computer_name,
-                "console_text": self.console_html,
+                "console_text": self.console_text,
             },
         )
         self.send_to_selfbot({"op": "WEBSITE_CONNECT"})
