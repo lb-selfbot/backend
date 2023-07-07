@@ -259,7 +259,7 @@ class SelfbotConsumer(WebsocketConsumer):
 
                 self.relay_to_website(
                     {
-                        "op": "CONSOLE_APPEND",
+                        "op": "CONSOLE_SET",
                         "data": {
                             "text": self.console_html,
                         },
