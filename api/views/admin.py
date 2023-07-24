@@ -11,6 +11,7 @@ from lightningbot import settings
 from ..utils import keys, github, misc, password_reset, logs
 from ..models import User, Key, Order, Release
 
+
 # POST /api/v3/admin/create-key
 def create_key(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -106,6 +107,38 @@ def delete_release(request: http.HttpRequest) -> http.HttpResponse:
         log_type="delete_release",
         user=request.user,
         info={"release_id": release_id},
+    )
+
+    return http.JsonResponse({"error": False})
+
+
+# POST /api/v3/admin/deploy-docs
+def deploy_docs(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Deploy docs
+    """
+    if not request.user.is_superuser:
+        return http.JsonResponse(
+            {"error": True, "message": "Not authorized"}, status=403
+        )
+
+    # Save the static site from GitHub actions to the docs folder
+    docs_path = "/var/www/docs.lightning-bot.com"
+    if not os.path.exists(docs_path):
+        os.makedirs(docs_path)
+
+    try:
+        github.download_latest_artifact("LightningDev1", "LB-Docs", docs_path)
+    except Exception as exc:
+        return http.JsonResponse(
+            {"error": True, "message": f"Failed to download artifact: {exc}"},
+            status=500,
+        )
+
+    logs.create_entry(
+        log_type="deploy_docs",
+        user=request.user,
+        info={},
     )
 
     return http.JsonResponse({"error": False})
