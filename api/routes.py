@@ -48,7 +48,7 @@ class Route:
         self.required_json_fields = required_json_fields
         self.flags = flags
 
-    def get_path(self) -> (resolvers.URLPattern | resolvers.RoutePattern):
+    def get_path(self) -> resolvers.URLPattern | resolvers.RoutePattern:
         """
         Get the Django path for this route
         """
@@ -156,7 +156,7 @@ routes = [
             "str:password",
             "bool:session",
             "bool:rememberme",
-            "str:captcha_token"
+            "str:captcha_token",
         ],
         flags=RouteFlags.JSON_REQUIRED,
     ),
@@ -180,7 +180,12 @@ routes = [
         views.auth.reset_password,
         name="Reset Password",
         methods=["POST"],
-        required_json_fields=["str:username", "str:new_password", "str:token", "str:captcha_token"],
+        required_json_fields=[
+            "str:username",
+            "str:new_password",
+            "str:token",
+            "str:captcha_token",
+        ],
         flags=RouteFlags.JSON_REQUIRED,
     ),
     Route(
@@ -304,8 +309,8 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:version", "str:branch", "str:changelog"],
         flags=RouteFlags.LOGIN_REQUIRED
-              | RouteFlags.ADMIN_REQUIRED
-              | RouteFlags.JSON_REQUIRED,
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/delete-release",
@@ -314,8 +319,15 @@ routes = [
         methods=["POST"],
         required_json_fields=["int:release_id"],
         flags=RouteFlags.LOGIN_REQUIRED
-              | RouteFlags.ADMIN_REQUIRED
-              | RouteFlags.JSON_REQUIRED,
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
+    ),
+    Route(
+        "v3/admin/deploy-docs",
+        views.admin.deploy_docs,
+        name="Deploy Docs",
+        methods=["POST"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
     ),
     Route(
         "v3/admin/table-data/users",
@@ -359,8 +371,8 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:action", "int:user_id", "str:data"],
         flags=RouteFlags.LOGIN_REQUIRED
-              | RouteFlags.ADMIN_REQUIRED
-              | RouteFlags.JSON_REQUIRED,
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/action/key",
@@ -369,8 +381,8 @@ routes = [
         methods=["POST"],
         required_json_fields=["str:action", "int:key_id"],
         flags=RouteFlags.LOGIN_REQUIRED
-              | RouteFlags.ADMIN_REQUIRED
-              | RouteFlags.JSON_REQUIRED,
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
     ),
     # Discord Bot
     Route(
