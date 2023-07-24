@@ -327,7 +327,7 @@ routes = [
         views.admin.deploy_docs,
         name="Deploy Docs",
         methods=["POST"],
-        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/table-data/users",
