@@ -155,7 +155,7 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         Called when a WebSocket JSON message is received
         """
-        print(datetime.now(), "received from", self.django_user, json_message)
+        print(datetime.now(), "received from", self.django_user, json_message.get("op"))
 
         json_data = json_message.get("data", {})
         match json_message.get("op"):
