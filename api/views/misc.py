@@ -172,31 +172,31 @@ def ccgen(request: http.HttpRequest) -> http.HttpResponse:
     match credit_card_type:
         case "mastercard":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.mastercard_prefix_list, 16
+                creditcard_generator.mastercard_prefix_list, 16, "mastercard"
             )
         case "visa16":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.visa_prefix_list, 16
+                creditcard_generator.visa_prefix_list, 16, "visa"
             )
         case "visa13":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.visa_prefix_list, 13
+                creditcard_generator.visa_prefix_list, 13, "visa"
             )
         case "amex":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.amex_prefix_list, 15
+                creditcard_generator.amex_prefix_list, 15, "amex"
             )
         case "discover":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.discover_prefix_list, 16
+                creditcard_generator.discover_prefix_list, 16, "discover"
             )
         case "diners":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.diners_prefix_list, 14
+                creditcard_generator.diners_prefix_list, 14, "diners"
             )
         case "jcb":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.jcb_prefix_list, 16
+                creditcard_generator.jcb_prefix_list, 16, "jcb"
             )
 
     return http.JsonResponse({"status": 200, **credit_card})
