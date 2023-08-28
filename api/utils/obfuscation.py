@@ -78,8 +78,6 @@ def obfuscate_javascript(code: str) -> str:
 
         subprocess.run(
             [
-                "powershell",
-                "-c",
                 "npx",
                 "javascript-obfuscator",
                 code_file.name,
