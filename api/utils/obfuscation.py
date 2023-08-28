@@ -76,6 +76,8 @@ def obfuscate_javascript(code: str) -> str:
         code_file.write(code.encode())
         code_file.flush()
 
+        os.environ["PATH"] = "/root/.nvm/versions/node/v19.4.0/bin:" + os.environ["PATH"]
+
         subprocess.run(
             [
                 "npx",
