@@ -527,4 +527,10 @@ routes = [
         name="What",
         methods=["GET"],
     ),
+    Route(
+        "v3/imagegen/speechbubble",
+        views.imagegen.speechbubble,
+        name="Speechbubble",
+        methods=["GET"],
+    ),
 ]

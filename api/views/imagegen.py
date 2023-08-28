@@ -234,3 +234,15 @@ def what(request: http.HttpRequest) -> http.HttpResponse:
         return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
     except Exception:
         return http.JsonResponse({"error": "An error has occurred"})
+
+
+# /api/v3/imagegen/speechbubble
+def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Speechbubble
+    """
+    try:
+        image = alexflipnote.speechbubble(request.GET.get("url", ""))
+        return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
+    except Exception:
+        return http.JsonResponse({"error": "An error has occurred"})

@@ -477,3 +477,21 @@ class AlexFlipNote:
         background.paste(face, (40, 40), face)
         background.paste(base, (0, 0), base)
         return background
+
+    def speechbubble(self, url: str) -> PIL.Image.Image:
+        """
+        What
+        """
+        try:
+            icon = io.BytesIO(requests.get(url, timeout=10).content)
+        except Exception as exc:
+            raise Exception("Invalid URL") from exc
+
+        image = PIL.Image.open(icon).convert("RGBA")
+        bubble = PIL.Image.open("assets/speechbubble/speechbubble.png")
+
+        bubble = bubble.resize((image.size[0], round(image.size[1] * 0.3)))
+
+        image.paste(bubble, (0, 0), bubble)
+
+        return image
