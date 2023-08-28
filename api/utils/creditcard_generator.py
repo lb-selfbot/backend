@@ -42,6 +42,7 @@ voyager_prefix_list = [[8, 6, 9, 9]]
 def _take_screenshot(url: str) -> bytes:
     # Create a new instance of the Chrome driver
     options = webdriver.ChromeOptions()
+    options.add_argument("--no-sandbox")
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--force-device-scale-factor=3")
