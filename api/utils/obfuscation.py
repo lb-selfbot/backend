@@ -56,14 +56,22 @@ def obfuscate_lua(code: str) -> str:
 
 
 js_options = [
-    "--compact true",
-    "--control-flow-flattening true",
-    "--control-flow-flattening-threshold 1",
-    "--numbers-to-expressions true",
-    "--simplify true",
-    "--string-array-shuffle true",
-    "--split-strings true",
-    "--string-array-threshold 1",
+    "--compact",
+    "true",
+    "--control-flow-flattening",
+    "true",
+    "--control-flow-flattening-threshold",
+    "1",
+    "--numbers-to-expressions",
+    "true",
+    "--simplify",
+    "true",
+    "--string-array-shuffle",
+    "true",
+    "--split-strings",
+    "true",
+    "--string-array-threshold",
+    "1",
     # "--string-array-encoding base64",
 ]
 
@@ -76,7 +84,9 @@ def obfuscate_javascript(code: str) -> str:
         code_file.write(code.encode())
         code_file.flush()
 
-        os.environ["PATH"] = "/root/.nvm/versions/node/v19.4.0/bin:" + os.environ["PATH"]
+        os.environ["PATH"] = (
+            "/root/.nvm/versions/node/v19.4.0/bin:" + os.environ["PATH"]
+        )
 
         subprocess.run(
             [
