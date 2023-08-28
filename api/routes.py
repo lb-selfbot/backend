@@ -277,6 +277,14 @@ routes = [
         required_json_fields=["str:image"],
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/obfuscate",
+        views.selfbot.obfuscate,
+        name="Obfuscate",
+        methods=["POST"],
+        required_json_fields=["str:lang", "str:code"],
+        flags=RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",
@@ -327,7 +335,9 @@ routes = [
         views.admin.deploy_docs,
         name="Deploy Docs",
         methods=["POST"],
-        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/table-data/users",

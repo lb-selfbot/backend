@@ -14,7 +14,7 @@ from io import BytesIO
 from django import http
 
 
-from api.utils import keys, releases, logs, validation
+from api.utils import keys, releases, logs, validation, obfuscation
 from api.utils.encryption import Encryption
 from clyde_bot.bot import ClydeJob, clyde_bot
 
@@ -254,5 +254,29 @@ def ocr(request: http.HttpRequest) -> http.HttpResponse:
         extracted_text = pytesseract.image_to_string(image)
 
         return http.JsonResponse({"error": False, "text": extracted_text})
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
+
+# POST /api/v3/selfbot/obfuscate
+def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Obfuscate code
+    """
+    try:
+        language = str(request.POST["lang"]).lower()
+        code = str(request.POST["code"])
+        
+        match language:
+            case "python":
+                code = obfuscation.obfuscate_python(code)
+            case "lua":
+                code = obfuscation.obfuscate_lua(code)
+            case "javascript":
+                code = obfuscation.obfuscate_javascript(code)
+            case _:
+                return http.JsonResponse({"error": True, "reason": "Invalid language"}, status=400)
+        
+        return http.JsonResponse({"error": False, "code": code})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
