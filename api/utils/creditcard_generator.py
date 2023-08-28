@@ -2,6 +2,15 @@
 Generate random credit card numbers
 """
 import random
+import tempfile
+import os
+
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+
+from lightningbot import settings
+
+ChromeDriverManager().install()
 
 visa_prefix_list = [
     [4, 5, 3, 9],
@@ -28,6 +37,72 @@ diners_prefix_list = [
 enroute_prefix_list = [[2, 0, 1, 4], [2, 1, 4, 9]]
 jcb_prefix_list = [[3, 5]]
 voyager_prefix_list = [[8, 6, 9, 9]]
+
+
+def _take_screenshot(url: str) -> bytes:
+    # Create a new instance of the Chrome driver
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--force-device-scale-factor=3")
+
+    driver = webdriver.Chrome(options)
+    driver.set_window_rect(0, 0, 450, 300)
+
+    # Take a screenshot of the page
+    driver.get(url)
+    screenshot = driver.get_screenshot_as_png()
+
+    driver.quit()
+
+    return screenshot
+
+
+def create_visualisation(name: str, number: int, exp: str, cvv: str, type: str) -> str:
+    with open("page.html", "r") as f:
+        page = f.read()
+
+    page = page.replace("{{name}}", name)
+    page = page.replace("{{number}}", number)
+    page = page.replace("{{exp}}", exp)
+    page = page.replace("{{cvv}}", cvv)
+
+    brand_logo = ""
+    match type:
+        case "mastercard":
+            brand_logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Mastercard_2019_logo.svg/1200px-Mastercard_2019_logo.svg.png"
+        case "visa":
+            brand_logo = (
+                "https://seeklogo.com/images/V/VISA-logo-DD37676279-seeklogo.com.png"
+            )
+        case "amex":
+            brand_logo = "https://i.pinimg.com/originals/c9/10/94/c910944ac6247ed2d0d47279453c5959.jpg"
+        case "discover":
+            brand_logo = (
+                "https://1000logos.net/wp-content/uploads/2021/05/Discover-logo.png"
+            )
+        case "diners":
+            brand_logo = "https://1000logos.net/wp-content/uploads/2021/05/Diners-Club-International-logo.png"
+        case "jcb":
+            brand_logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/JCB_logo.svg/2560px-JCB_logo.svg.png"
+
+    page = page.replace("{{brand_logo}}", brand_logo)
+
+    with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+        f.write(page.encode("utf-8"))
+        f.flush()
+        url = "file://" + f.name
+
+        screenshot = _take_screenshot(url)
+
+    vis_path = os.path.join(settings.STATIC_ROOT, "creditcards")
+    if not os.path.exists(vis_path):
+        os.makedirs(vis_path)
+    
+    with open(os.path.join(vis_path, f"{number}.png"), "wb") as f:
+        f.write(screenshot)
+
+    return f"https://api.lightning-bot.com/static/creditcards/{number}.png"
 
 
 class CreditCardGenerator:
@@ -59,6 +134,10 @@ class CreditCardGenerator:
         checkdigit = self.luhn_algorithm([*credit_card_number, 0])
         credit_card_number.append(10 - (checkdigit % 10))
 
+        # Add space every 4 digits
+        for i in range(4, len(credit_card_number), 5):
+            credit_card_number.insert(i, " ")
+
         return "".join(map(str, credit_card_number))
 
     def random_int(self, num1, num2, length):
@@ -70,13 +149,21 @@ class CreditCardGenerator:
             num = f"0{num}"
         return num
 
-    def credit_card_number(self, prefix_list, length):
+    def credit_card_number(self, prefix_list, length, brand):
         """
         Generate a credit card number with a specific prefix and length
         """
         prefix = self.generator.choice(prefix_list)
+
+        number =  self.completed_number(prefix, length)
+        cvv = str(self.random_int(100, 999, 3))
+        exp = f"{self.random_int(1, 12, 2)}/{self.random_int(25, 30, 2)}"
+
+        vis = create_visualisation("John Doe", number, exp, cvv, brand)
+
         return {
-            "number": self.completed_number(prefix, length),
-            "ccv": str(self.random_int(100, 999, 3)),
-            "expiry_date": f"{self.random_int(1, 12, 2)}/{self.random_int(23, 30, 2)}",
+            "number": number,
+            "cvv": cvv,
+            "expiry_date": exp,
+            "visualisation": vis,
         }

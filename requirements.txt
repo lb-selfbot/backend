@@ -17,3 +17,5 @@ git+https://github.com/dolfies/discord.py-self
 janus
 pytesseract
 pyobf2
+selenium
+webdriver-manager
