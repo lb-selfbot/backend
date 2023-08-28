@@ -59,7 +59,7 @@ def _take_screenshot(url: str) -> bytes:
 
 
 def create_visualisation(name: str, number: int, exp: str, cvv: str, type: str) -> str:
-    with open("page.html", "r") as f:
+    with open("templates/creditcard/page.html", "r") as f:
         page = f.read()
 
     page = page.replace("{{name}}", name)
