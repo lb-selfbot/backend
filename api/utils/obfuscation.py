@@ -97,7 +97,6 @@ def obfuscate_javascript(code: str) -> str:
                 code_file.name,
                 *js_options,
             ],
-            shell=True,
         )
 
         with open(code_file.name, "r") as f:
