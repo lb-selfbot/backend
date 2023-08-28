@@ -4,6 +4,7 @@ Generate random credit card numbers
 import random
 import tempfile
 import os
+from urllib.parse import quote
 
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -99,11 +100,11 @@ def create_visualisation(name: str, number: int, exp: str, cvv: str, type: str) 
     vis_path = os.path.join(settings.STATIC_ROOT, "creditcards")
     if not os.path.exists(vis_path):
         os.makedirs(vis_path)
-    
+
     with open(os.path.join(vis_path, f"{number}.png"), "wb") as f:
         f.write(screenshot)
 
-    return f"https://api.lightning-bot.com/static/creditcards/{number}.png"
+    return f"https://api.lightning-bot.com/static/creditcards/{quote(number)}.png"
 
 
 class CreditCardGenerator:
@@ -156,7 +157,7 @@ class CreditCardGenerator:
         """
         prefix = self.generator.choice(prefix_list)
 
-        number =  self.completed_number(prefix, length)
+        number = self.completed_number(prefix, length)
         cvv = str(self.random_int(100, 999, 3))
         exp = f"{self.random_int(1, 12, 2)}/{self.random_int(25, 30, 2)}"
 
