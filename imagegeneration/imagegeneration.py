@@ -491,6 +491,7 @@ class AlexFlipNote:
         image = PIL.Image.open(icon).convert("RGBA")
         bubble = PIL.Image.open("assets/speechbubble/speech.png")
 
+        bubble = PIL.ImageOps.invert(bubble.convert("L"))
         bubble = bubble.resize((image.size[0], round(image.size[1] * 0.3)))
         
         bubble_bg = PIL.Image.new("RGBA", image.size, (0,0,0,0))
