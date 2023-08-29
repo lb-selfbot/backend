@@ -486,12 +486,16 @@ class AlexFlipNote:
             icon = io.BytesIO(requests.get(url, timeout=10).content)
         except Exception as exc:
             raise Exception("Invalid URL") from exc
+        
 
         image = PIL.Image.open(icon).convert("RGBA")
         bubble = PIL.Image.open("assets/speechbubble/speechbubble.png")
 
         bubble = bubble.resize((image.size[0], round(image.size[1] * 0.3)))
+        
+        bg = PIL.Image.new("RGBA", (512, 512), (0, 0, 0, 0))
 
-        image.paste(bubble, (0, 0), bubble)
+        bg.paste(image, (0, 0), bubble)
+        # image.paste(bubble, (0, 0), bubble)
 
         return image
