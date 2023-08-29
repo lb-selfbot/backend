@@ -493,9 +493,15 @@ class AlexFlipNote:
 
         bubble = bubble.resize((image.size[0], round(image.size[1] * 0.3)))
         
-        bg = PIL.Image.new("RGBA", (512, 512), (0, 0, 0, 0))
+        bubble_bg = PIL.Image.new("RGBA", image.size, (0,0,0,0))
+        bubble_bg.paste(bubble, (0, 0), bubble)
 
-        bg.paste(image, (0, 0), bubble)
-        # image.paste(bubble, (0, 0), bubble)
+        bubble_bg = PIL.ImageOps.invert(bubble_bg.convert("L"))
+
+        bubble_bg.show()
+
+        bg = PIL.Image.new("RGBA", image.size, (0, 0, 0, 0))
+
+        bg.paste(image, (0, 0), bubble_bg)
 
         return bg
