@@ -498,4 +498,4 @@ class AlexFlipNote:
         bg.paste(image, (0, 0), bubble)
         # image.paste(bubble, (0, 0), bubble)
 
-        return image
+        return bg
