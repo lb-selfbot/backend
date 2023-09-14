@@ -528,7 +528,7 @@ routes = [
         methods=["GET"],
     ),
     Route(
-        "v3/imagegen/speechbubble",
+        "v3/imagegen/speechbubble.gif",
         views.imagegen.speechbubble,
         name="Speechbubble",
         methods=["GET"],
