@@ -17,6 +17,7 @@ import PIL.ImageFilter
 import PIL.ImageChops
 import PIL.ImageEnhance
 import PIL.ImageColor
+import PIL.ImageSequence
 
 
 class AlexFlipNote:
