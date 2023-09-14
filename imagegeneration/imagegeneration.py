@@ -507,13 +507,15 @@ class AlexFlipNote:
 
         out_image = io.BytesIO()
 
+        format = "GIF" if force_gif else image.format if image.format else "PNG"
+
         output_frames[0].save(
             out_image,
-            format="GIF" if force_gif else image.format,
+            format=format,
             save_all=True,
             append_images=output_frames[1:],
             loop=image.info.get("loop", 0),
             duration=image.info.get("duration", 0),
         )
 
-        return out_image.getvalue(), "GIF" if force_gif else image.format
+        return out_image.getvalue(), format
