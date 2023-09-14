@@ -478,31 +478,41 @@ class AlexFlipNote:
         background.paste(base, (0, 0), base)
         return background
 
-    def speechbubble(self, url: str) -> PIL.Image.Image:
+    def add_mask(self, img: PIL.Image.Image, mask: PIL.Image.Image) -> PIL.Image.Image:
+        mask = PIL.ImageOps.invert(mask.convert("L"))
+        mask = mask.resize((img.size[0], round(img.size[1] * 0.3)))
+
+        mask_bg = PIL.Image.new(img.mode, img.size, (0, 0, 0, 0))
+        mask_bg.paste(mask, (0, 0), mask)
+
+        return PIL.ImageChops.subtract(img, mask_bg)
+
+    def speechbubble(self, url: str, force_gif: bool) -> tuple[bytes, str]:
         """
-        What
+        Speechbubble
         """
         try:
             icon = io.BytesIO(requests.get(url, timeout=10).content)
         except Exception as exc:
             raise Exception("Invalid URL") from exc
-        
 
-        image = PIL.Image.open(icon).convert("RGBA")
+        image = PIL.Image.open(icon)
         bubble = PIL.Image.open("assets/speechbubble/speech.png")
 
-        bubble = PIL.ImageOps.invert(bubble.convert("L"))
-        bubble = bubble.resize((image.size[0], round(image.size[1] * 0.3)))
-        
-        bubble_bg = PIL.Image.new("RGBA", image.size, (0,0,0,0))
-        bubble_bg.paste(bubble, (0, 0), bubble)
+        output_frames = []
 
-        bubble_bg = PIL.ImageOps.invert(bubble_bg.convert("L"))
+        for frame in PIL.ImageSequence.Iterator(image):
+            output_frames.append(self.add_mask(frame.convert("RGBA"), bubble))
 
-        bubble_bg.show()
+        out_image = io.BytesIO()
 
-        bg = PIL.Image.new("RGBA", image.size, (0, 0, 0, 0))
+        output_frames[0].save(
+            out_image,
+            format="GIF" if force_gif else image.format,
+            save_all=True,
+            append_images=output_frames[1:],
+            loop=image.info.get("loop", 0),
+            duration=image.info.get("duration", 0),
+        )
 
-        bg.paste(image, (0, 0), bubble_bg)
-
-        return bg
+        return out_image.getvalue(), "GIF" if force_gif else image.format

@@ -10,6 +10,7 @@ from ..utils import misc
 
 alexflipnote = imagegeneration.AlexFlipNote()
 
+
 # /api/v3/imagegen/achievement
 def achievement(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -118,7 +119,9 @@ def filter_image(request: http.HttpRequest) -> http.HttpResponse:
     Filter
     """
     try:
-        image = alexflipnote.filter(request.GET.get("url", ""), request.GET.get("filter", ""))
+        image = alexflipnote.filter(
+            request.GET.get("url", ""), request.GET.get("filter", "")
+        )
         return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
     except Exception:
         return http.JsonResponse({"error": "An error has occurred"})
@@ -130,7 +133,9 @@ def floor(request: http.HttpRequest) -> http.HttpResponse:
     Floor
     """
     try:
-        image = alexflipnote.floor(request.GET.get("text", ""), request.GET.get("url", ""))
+        image = alexflipnote.floor(
+            request.GET.get("text", ""), request.GET.get("url", "")
+        )
         return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
     except Exception:
         return http.JsonResponse({"error": "An error has occurred"})
@@ -218,7 +223,9 @@ def ship(request: http.HttpRequest) -> http.HttpResponse:
     Ship
     """
     try:
-        image = alexflipnote.ship(request.GET.get("url1", ""), request.GET.get("url2", ""))
+        image = alexflipnote.ship(
+            request.GET.get("url1", ""), request.GET.get("url2", "")
+        )
         return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
     except Exception:
         return http.JsonResponse({"error": "An error has occurred"})
@@ -242,7 +249,10 @@ def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
     Speechbubble
     """
     try:
-        image = alexflipnote.speechbubble(request.GET.get("url", ""))
-        return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
+        image, format = alexflipnote.speechbubble(
+            request.GET.get("url", ""), request.GET.get("gif", "") == "true"
+        )
+        
+        return http.HttpResponse(image, content_type=f"image/{format}")
     except Exception as e:
         return http.JsonResponse({"error": "An error has occurred: " + str(e)})
