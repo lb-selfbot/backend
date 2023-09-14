@@ -263,19 +263,15 @@ def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
     Speechbubble
     """
     try:
-        print(request.GET)
         format = request.GET.get("format", "png").lower()
         image, format = alexflipnote.speechbubble(
             request.GET.get("url", ""), format == "gif"
         )
 
-        print(len(image))
-
         image = save_image(image, format)
 
         return http.HttpResponseRedirect(f"/api/v3/imagegen/view/{image.name}")
     except Exception as e:
-        raise e
         return http.JsonResponse({"error": f"An error has occurred: {e}"})
 
 
