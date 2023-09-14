@@ -25,7 +25,9 @@ class ApiMiddleware:
         Get the route for the given path
         """
         for route in routes.routes:
-            if route.route == path:
+            match = route.get_path().resolve(path)
+            
+            if match is not None:
                 return route
 
         return None

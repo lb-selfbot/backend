@@ -533,4 +533,10 @@ routes = [
         name="Speechbubble",
         methods=["GET"],
     ),
+    Route(
+        "v3/imagegen/view/<str:image>",
+        views.imagegen.view_image,
+        name="View Image",
+        methods=["GET"],
+    ),
 ]

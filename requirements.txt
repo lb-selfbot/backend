@@ -10,7 +10,7 @@ python-dotenv
 django-dbbackup
 django-storages
 psutil
-pillow
+pillow==9.4.0
 mysqlclient
 bcrypt
 git+https://github.com/dolfies/discord.py-self

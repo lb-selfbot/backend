@@ -8,7 +8,19 @@ from imagegeneration import imagegeneration
 
 from ..utils import misc
 
+from ..models import Image
+
 alexflipnote = imagegeneration.AlexFlipNote()
+
+def save_image(image: bytes, format: str) -> Image:
+    """
+    Save an image to the database
+    """
+
+    name = misc.random_string(16)
+
+    return Image.objects.create(image=image, format=format, name=f"{name}.{format}".lower())
+
 
 
 # /api/v3/imagegen/achievement
@@ -19,8 +31,8 @@ def achievement(request: http.HttpRequest) -> http.HttpResponse:
     try:
         image = alexflipnote.create_achievement(request.GET.get("text", ""))
         return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
-    except Exception:
-        return http.JsonResponse({"error": "An error has occurred"})
+    except Exception as e:
+        return http.JsonResponse({"error": "An error has occurred: " + str(e)})
 
 
 # /api/v3/imagegen/amiajoke
@@ -249,10 +261,26 @@ def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
     Speechbubble
     """
     try:
+        format = request.GET.get("format", "png").lower()
         image, format = alexflipnote.speechbubble(
-            request.GET.get("url", ""), request.GET.get("gif", "") == "true"
+            request.GET.get("url", ""), format == "gif"
         )
 
-        return http.HttpResponse(image, content_type=f"image/{format}".lower())
+        image = save_image(image, format)
+
+        return http.HttpResponseRedirect(f"/api/v3/imagegen/view/{image.name}")
     except Exception as e:
+        raise e
         return http.JsonResponse({"error": "An error has occurred: " + str(e)})
+
+
+# /api/v3/imagegen/view/image
+def view_image(_request: http.HttpRequest, image: str) -> http.HttpResponse:
+    """
+    View image
+    """
+    image = Image.objects.filter(name=image).first()
+    if image is None:
+        return http.JsonResponse({"error": "Image not found"}, status=404)
+    
+    return http.HttpResponse(image.image, content_type="image/png")

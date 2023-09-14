@@ -34,12 +34,12 @@ def random_string(length: int) -> str:
     )
 
 
-def image_to_bytes(image: PIL.Image) -> bytes:
+def image_to_bytes(image: PIL.Image, format: str = "png") -> bytes:
     """
     Convert a PIL image to bytes
     """
     output = io.BytesIO()
-    image.save(output, format="PNG")
+    image.save(output, format=format)
     return output.getvalue()
 
 

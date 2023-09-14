@@ -110,3 +110,17 @@ class Log(models.Model):
 
     def __str__(self):
         return f"{self.log_type} - {self.user.username if self.user else 'No user'}"
+
+class Image(models.Model):
+    """
+    Image model for imagegen
+    """
+
+    image = models.BinaryField()
+    format = models.CharField(max_length=16, default="")
+    name = models.CharField(max_length=255, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.format} - {self.created_at}"
+
