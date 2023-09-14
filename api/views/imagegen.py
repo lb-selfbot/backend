@@ -270,7 +270,6 @@ def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
 
         return http.HttpResponseRedirect(f"/api/v3/imagegen/view/{image.name}")
     except Exception as e:
-        raise e
         return http.JsonResponse({"error": "An error has occurred: " + str(e)})
 
 
