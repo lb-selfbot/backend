@@ -25,6 +25,11 @@ class User(AbstractUser):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Hosting
+    is_hosting = models.BooleanField(default=False)
+    hosting_credit = models.IntegerField(default=0) # In minutes
+    
+
 
 class PasswordResetToken(models.Model):
     """
