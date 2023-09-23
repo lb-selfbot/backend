@@ -27,8 +27,8 @@ class User(AbstractUser):
 
     # Hosting
     is_hosting = models.BooleanField(default=False)
-    hosting_credit = models.IntegerField(default=0) # In minutes
-    
+    hosting_credit = models.IntegerField(default=0)  # In minutes
+    hosting_token = models.CharField(max_length=512, default="")  # RSA encrypted token
 
 
 class PasswordResetToken(models.Model):
@@ -116,6 +116,7 @@ class Log(models.Model):
     def __str__(self):
         return f"{self.log_type} - {self.user.username if self.user else 'No user'}"
 
+
 class Image(models.Model):
     """
     Image model for imagegen
@@ -128,4 +129,3 @@ class Image(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.format} - {self.created_at}"
-
