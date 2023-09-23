@@ -157,13 +157,9 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         if self.password == "s]+zs,p7+X2eWY$gJ90£DjZ}RlWjk21*sbY<lE)VTWy5b!N'":
             # Login with token
-            user: User = User.objects.get(username=self.username)
+            return User.objects.get(username=self.username)
         else:
-            user: User = auth.authenticate(
-                username=self.username, password=self.password
-            )
-
-        return user
+            return auth.authenticate(username=self.username, password=self.password)
 
     def receive_json(self, json_message: typing.Dict[any, any]):
         """
