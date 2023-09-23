@@ -248,6 +248,21 @@ routes = [
         flags=RouteFlags.JSON_REQUIRED,
     ),
     Route(
+        "v3/selfbot/enable-hosting",
+        views.selfbot.enable_hosting,
+        name="Enable Hosting",
+        methods=["POST"],
+        required_json_fields=["str:token"],
+        flags=RouteFlags.JSON_REQUIRED | RouteFlags.LOGIN_REQUIRED,
+    ),
+    Route(
+        "v3/selfbot/disable-hosting",
+        views.selfbot.disable_hosting,
+        name="Disable Hosting",
+        methods=["POST"],
+        flags=RouteFlags.LOGIN_REQUIRED,
+    ),
+    Route(
         "v3/selfbot/start-params",
         views.selfbot.start_params,
         name="Start Params",

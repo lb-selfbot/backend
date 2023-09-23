@@ -16,6 +16,7 @@ from django import http
 
 from api.utils import keys, releases, logs, validation, obfuscation
 from api.utils.encryption import Encryption
+from api.models import User
 from clyde_bot.bot import ClydeJob, clyde_bot
 
 encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
@@ -113,6 +114,28 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
             },
         }
     )
+
+
+# POST /api/v3/selfbot/enable-hosting
+def enable_hosting(request: http.HttpRequest) -> http.HttpResponse:
+    user: User = request.user
+
+    user.is_hosting = True
+    user.hosting_token = request.POST["token"]
+    user.save()
+
+    return http.JsonResponse({"error": False})
+
+
+# POST /api/v3/selfbot/disable-hosting
+def disable_hosting(request: http.HttpRequest) -> http.HttpResponse:
+    user: User = request.user
+
+    user.is_hosting = False
+    user.hosting_token = ""
+    user.save()
+
+    return http.JsonResponse({"error": False})
 
 
 # POST /api/v3/selfbot/start-params
@@ -266,7 +289,7 @@ def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
     try:
         language = str(request.POST["lang"]).lower()
         code = str(request.POST["code"])
-        
+
         match language:
             case "python":
                 code = obfuscation.obfuscate_python(code)
@@ -275,8 +298,10 @@ def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
             case "javascript":
                 code = obfuscation.obfuscate_javascript(code)
             case _:
-                return http.JsonResponse({"error": True, "reason": "Invalid language"}, status=400)
-        
+                return http.JsonResponse(
+                    {"error": True, "reason": "Invalid language"}, status=400
+                )
+
         return http.JsonResponse({"error": False, "code": code})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
