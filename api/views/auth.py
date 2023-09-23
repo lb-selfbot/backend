@@ -74,7 +74,7 @@ def register(request: http.HttpRequest) -> http.HttpResponse:
                     "status": 400,
                     "error": validation_error_str,
                     "message": "Username must include only letters,"
-                               + " numbers, underscores and periods.",
+                    + " numbers, underscores and periods.",
                 },
                 status=400,
             )
@@ -340,6 +340,8 @@ def get_user(request: http.HttpRequest) -> http.HttpResponse:
                 "key": getattr(request.user.redeemed_key, "key", "None"),
                 "free_trial_expiry": request.user.free_trial_expiry,
                 "last_selfbot_login": request.user.last_selfbot_login,
+                "is_hosting": request.user.is_hosting,
+                "hosting_credit": request.user.hosting_credit,
             },
         }
     )
