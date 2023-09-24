@@ -24,6 +24,7 @@ def all_stats(user: User) -> dict:
         "users": User.objects.count(),
         "logins": User.objects.aggregate(Sum("logins"))["logins__sum"],
         "hosting": User.objects.filter(is_hosting=True).count(),
+        "hosting_status": "Online",
     }
 
     if user.is_staff or user.is_superuser:
