@@ -521,3 +521,114 @@ class AlexFlipNote:
         )
 
         return out_image.getvalue(), format
+
+    def quote(self, author: str, text: str, background_url: str) -> PIL.Image.Image:
+        if background_url == "":
+            background_url = "https://source.unsplash.com/random/1920x1080"
+
+        try:
+            background = PIL.Image.open(
+                io.BytesIO(requests.get(background_url, timeout=10).content)
+            )
+
+            background = background.filter(PIL.ImageFilter.GaussianBlur(radius=1))
+            background = PIL.ImageEnhance.Brightness(background).enhance(0.6)
+        except Exception as exc:
+            raise Exception("Invalid URL") from exc
+
+        font = PIL.ImageFont.truetype("assets/_fonts/Arial.ttf", 35)
+        font_bi = PIL.ImageFont.truetype("assets/_fonts/ArialBI.ttf", 35)
+
+        draw = PIL.ImageDraw.Draw(background)
+
+        # Draw text
+        lines = textwrap.wrap(text, width=100)
+        y_text = background.size[1] / 2
+        w = background.size[0]
+        for line in lines:
+            width, height = font.getsize(line)
+            draw.text(
+                ((w - width) / 2, y_text), line, font=font, fill=(255, 255, 255, 255)
+            )
+            y_text += height
+
+        # Draw author name
+        draw.text(
+            (background.size[0] - len(author) * 20 - 50, background.size[1] - 75),
+            "- " + author,
+            font=font_bi,
+            fill=(255, 255, 255, 255),
+        )
+
+        return background
+
+    def crop_to_circle(self, im):
+        bigsize = (im.size[0] * 3, im.size[1] * 3)
+        mask = PIL.Image.new("L", bigsize, 0)
+        PIL.ImageDraw.Draw(mask).ellipse((0, 0) + bigsize, fill=255)
+        mask = mask.resize(im.size, PIL.Image.ANTIALIAS)
+        mask = PIL.ImageChops.darker(mask, im.split()[-1])
+        im.putalpha(mask)
+
+    def discordquote(
+        self, author: str, author_url: str, author_color: str, text: str, timestamp: str
+    ):
+        # Get required width/height
+        lines = textwrap.wrap(text, width=100)
+
+        font = PIL.ImageFont.truetype("assets/_fonts/gg_sans.ttf", 35)
+        font_s = PIL.ImageFont.truetype("assets/_fonts/gg_sans.ttf", 20)
+        font_med = PIL.ImageFont.truetype("assets/_fonts/gg_sans_medium.ttf", 35)
+
+        bg_w = max(
+            max(200 + font.getsize(lines[0])[0], 300),  # Text
+            max(
+                200 + font_med.getsize(author)[0] + 15 + font_s.getsize(timestamp)[0],
+                300,
+            ),  # Author + Timestamp
+        )
+        bg_h = 100 + font.getsize(lines[0])[1] * len(lines)
+
+        background = PIL.Image.new("RGBA", (bg_w, bg_h), (49, 51, 56, 255))
+
+        draw = PIL.ImageDraw.Draw(background)
+
+        # Draw author icon
+        try:
+            author_icon = PIL.Image.open(
+                io.BytesIO(requests.get(author_url, timeout=10).content)
+            ).convert("RGBA")
+        except Exception as exc:
+            raise Exception("Invalid URL") from exc
+
+        author_icon = author_icon.resize((75, 75))
+        self.crop_to_circle(author_icon)
+        background.paste(author_icon, (40, 30), author_icon)
+
+        # Draw author name
+        try:
+            color = PIL.ImageColor.getrgb(author_color)
+        except ValueError:
+            color = (255, 255, 255, 255)
+
+        draw.text((140, 25), author, font=font_med, fill=color)
+
+        # Draw timestamp
+        draw.text(
+            (
+                140 + font_med.getsize(author)[0] + 15,
+                25 + font_med.getsize("a")[1] - font_s.getsize("a")[1],
+            ),
+            timestamp,
+            font=font_s,
+            fill=(148, 155, 164, 255),
+        )
+
+        # Draw text
+        text_x, text_y = 140, 72
+        for line in lines:
+            width, height = font.getsize(line)
+            draw.text((text_x, text_y), line, font=font, fill=(255, 255, 255, 255))
+            text_y += height
+
+        return background

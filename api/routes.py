@@ -549,6 +549,18 @@ routes = [
         methods=["GET"],
     ),
     Route(
+        "v3/imagegen/quote",
+        views.imagegen.quote,
+        name="Quote",
+        methods=["GET"],
+    ),
+    Route(
+        "v3/imagegen/discordquote",
+        views.imagegen.discordquote,
+        name="Discordquote",
+        methods=["GET"],
+    ),
+    Route(
         "v3/imagegen/view/<str:image>",
         views.imagegen.view_image,
         name="View Image",
