@@ -274,6 +274,7 @@ def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
     except Exception as e:
         return http.JsonResponse({"error": f"An error has occurred: {e}"})
 
+
 # /api/v3/imagegen/quote
 def quote(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -290,6 +291,7 @@ def quote(request: http.HttpRequest) -> http.HttpResponse:
     except Exception as e:
         return http.JsonResponse({"error": "An error has occurred: " + str(e)})
 
+
 # /api/v3/imagegen/discordquote
 def discordquote(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -302,7 +304,9 @@ def discordquote(request: http.HttpRequest) -> http.HttpResponse:
         text = request.GET.get("text", "")
         timestamp = request.GET.get("timestamp", "")
 
-        image = alexflipnote.discordquote(author, author_url, author_color, text, timestamp)
+        image = alexflipnote.discordquote(
+            author, author_url, author_color, text, timestamp
+        )
 
         return http.HttpResponse(misc.image_to_bytes(image), content_type="image/png")
     except Exception as e:

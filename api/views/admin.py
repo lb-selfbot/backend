@@ -24,6 +24,20 @@ def create_key(request: http.HttpRequest) -> http.HttpResponse:
     return http.JsonResponse({"error": False, "key": key.key})
 
 
+# POST /api/v3/admin/create-credit-key
+def create_credit_key(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Create a new API key for a user.
+    """
+    key = keys.create_credit_key(
+        create_reason="Admin Create Key",
+        created_by=request.user.username,
+        credit_amount=int(request.POST["credit_amount"]),
+    )
+
+    return http.JsonResponse({"error": False, "key": key.key})
+
+
 # POST /api/v3/admin/create-release
 def create_release(request: http.HttpRequest) -> http.HttpResponse:
     """

@@ -76,12 +76,49 @@ def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
 
     request.user.redeemed_key = key
     request.user.account_type = "Premium"
+    request.user.hosting_credit += 7 * 24 * 60  # 1 week
     request.user.save()
 
     logs.create_entry(
         log_type="key_redeem",
         user=request.user,
         info={"key": key.key},
+    )
+
+    return http.JsonResponse({"error": False})
+
+
+# POST /api/v3/selfbot/redeem-credit-key
+def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Redeem a credit key
+    """
+    key = keys.get_credit_key_if_unredeemed(request.POST["key"])
+    captcha_token: str = request.POST["captcha_token"]
+
+    if not validation.validate_captcha(request, captcha_token):
+        return http.JsonResponse(
+            {
+                "status": 400,
+                "error": "INVALID_CAPTCHA",
+                "message": "Invalid captcha response.",
+            },
+            status=400,
+        )
+
+    if key is None:
+        return http.JsonResponse({"error": True, "message": "Invalid key."}, status=400)
+
+    key.redeemed_by = request.user
+    key.save()
+
+    request.user.hosting_credit += key.credit_amount
+    request.user.save()
+
+    logs.create_entry(
+        log_type="credit_key_redeem",
+        user=request.user,
+        info={"key": key.key, "credit_amount": key.credit_amount},
     )
 
     return http.JsonResponse({"error": False})

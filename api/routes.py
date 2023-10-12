@@ -240,6 +240,14 @@ routes = [
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
     ),
     Route(
+        "v3/selfbot/redeem-credit-key",
+        views.selfbot.redeem_credit_key,
+        name="Redeem Credit Key",
+        methods=["POST"],
+        required_json_fields=["str:key", "str:captcha_token"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+    ),
+    Route(
         "v3/selfbot/check-version",
         views.selfbot.check_version,
         name="Check Version",
@@ -324,6 +332,16 @@ routes = [
         name="Create Key",
         methods=["POST"],
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
+        "v3/admin/create-credit-key",
+        views.admin.create_credit_key,
+        name="Create Credit Key",
+        methods=["POST"],
+        json=["int:credit_amount"],
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/admin/create-release",

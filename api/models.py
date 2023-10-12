@@ -77,6 +77,24 @@ class Key(models.Model):
         return f"{self.key} - {self.redeemed_by.username if self.redeemed_by else 'Unredeemed'}"
 
 
+class CreditKey(models.Model):
+    """
+    Credit key model
+    """
+
+    key = models.CharField(max_length=255, default="")
+    created_by = models.CharField(max_length=255, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    create_reason = models.TextField(default="")
+    credit_amount = models.IntegerField(default=0)
+    redeemed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.key} - {self.credit_amount // (24 * 60)} days - {self.redeemed_by.username if self.redeemed_by else 'Unredeemed'}"
+
+
 class Transcript(models.Model):
     """
     Transcript model
