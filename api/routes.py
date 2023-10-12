@@ -338,7 +338,7 @@ routes = [
         views.admin.create_credit_key,
         name="Create Credit Key",
         methods=["POST"],
-        json=["int:credit_amount"],
+        required_json_fields=["int:credit_amount"],
         flags=RouteFlags.LOGIN_REQUIRED
         | RouteFlags.ADMIN_REQUIRED
         | RouteFlags.JSON_REQUIRED,
