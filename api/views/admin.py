@@ -76,6 +76,10 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
             {"error": True, "message": f"Failed to download artifact: {exc}"},
             status=500,
         )
+    
+    if branch == "selfbot" and os.path.isfile("/hosting/LB-Selfbot-New"):
+        os.rename("/hosting/LB-Selfbot-New", "/hosting/LB-Selfbot")
+        os.system("sudo systemctl restart lightningbot-hosting")
 
     logs.create_entry(
         log_type="create_release",
