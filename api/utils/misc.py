@@ -1,6 +1,7 @@
 """
 Misc utils
 """
+import os
 import re
 import io
 import random
@@ -82,6 +83,9 @@ def get_rpm() -> int:
     """
     Get the requests per minute
     """
+    if os.name == "nt":
+        return 0
+    
     nginx_access_log = "/var/log/nginx/access.log"
 
     with open(nginx_access_log, "r", encoding="utf8") as file:

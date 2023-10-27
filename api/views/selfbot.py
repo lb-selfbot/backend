@@ -1,6 +1,7 @@
 """
 Selfbot API views
 """
+import os
 import time
 import json
 import base64
@@ -157,6 +158,12 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
 def enable_hosting(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
+    if user.key is None:
+        return http.JsonResponse(
+            {"error": True, "reason": "You must have a license key to use hosting."},
+            status=400,
+        )
+
     user.is_hosting = True
     user.hosting_token = request.POST["token"]
     user.save()
@@ -168,9 +175,237 @@ def enable_hosting(request: http.HttpRequest) -> http.HttpResponse:
 def disable_hosting(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
+    if user.key is None:
+        return http.JsonResponse(
+            {"error": True, "reason": "You must have a license key to use hosting."},
+            status=400,
+        )
+
     user.is_hosting = False
     user.hosting_token = ""
     user.save()
+
+    return http.JsonResponse({"error": False})
+
+
+# GET /api/v3/selfbot/hosting/list-files
+def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
+    user: User = request.user
+
+    if user.key is None:
+        return http.JsonResponse(
+            {"error": True, "reason": "You must have a license key to use hosting."},
+            status=400,
+        )
+
+    folder_name = (
+        "".join(c for c in request.user.username if c.isalnum())
+        + "-"
+        + str(request.user.id)
+    )
+
+    folder = os.path.join("/hosting", folder_name, "LightningBot")
+
+    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
+
+    if not os.path.exists(folder):
+        return http.JsonResponse(
+            {
+                "error": True,
+                "reason": "You must enable hosting at least once before you can list files.",
+            },
+            status=400,
+        )
+
+    content = {}
+
+    for root, subdirs, files in os.walk(folder):
+        root = root.replace(folder, "/").replace("\\", "/").replace("//", "/")
+        content[root] = {}
+
+        content[root]["folders"] = subdirs.copy()
+        content[root]["files"] = files.copy()
+
+    return http.JsonResponse({"error": False, "content": content})
+
+
+# POST /api/v3/selfbot/hosting/delete-folder
+def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
+    user: User = request.user
+
+    if user.key is None:
+        return http.JsonResponse(
+            {"error": True, "reason": "You must have a license key to use hosting."},
+            status=400,
+        )
+
+    folder_name = (
+        "".join(c for c in request.user.username if c.isalnum())
+        + "-"
+        + str(request.user.id)
+    )
+
+    folder = os.path.join("/hosting", folder_name, "LightningBot")
+
+    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
+
+    if not os.path.exists(folder):
+        return http.JsonResponse(
+            {
+                "error": True,
+                "reason": "You must enable hosting at least once before you can delete files.",
+            },
+            status=400,
+        )
+
+    folder_path = request.POST["folder_path"]
+
+    while folder_path.startswith("/"):
+        folder_path = folder_path[1:]
+
+    requested_path = os.path.join(folder, folder_path)
+
+    if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
+        print(
+            requested_path,
+            os.path.realpath(requested_path),
+            os.path.commonprefix((os.path.realpath(requested_path), folder)),
+            folder,
+        )
+        return http.JsonResponse(
+            {"error": True, "reason": "Invalid folder path."}, status=400
+        )
+
+    if not os.path.exists(os.path.join(folder, folder_path)):
+        return http.JsonResponse(
+            {"error": True, "reason": "Folder does not exist."}, status=400
+        )
+
+    if len(os.listdir(os.path.join(folder, folder_path))) != 0:
+        return http.JsonResponse(
+            {"error": True, "reason": "Folder is not empty."}, status=400
+        )
+
+    os.rmdir(os.path.join(folder, folder_path))
+
+    return http.JsonResponse({"error": False})
+
+
+# GET /api/v3/selfbot/hosting/download-file
+def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
+    user: User = request.user
+
+    if user.key is None:
+        return http.JsonResponse(
+            {"error": True, "reason": "You must have a license key to use hosting."},
+            status=400,
+        )
+
+    folder_name = (
+        "".join(c for c in request.user.username if c.isalnum())
+        + "-"
+        + str(request.user.id)
+    )
+
+    folder = os.path.join("/hosting", folder_name, "LightningBot")
+
+    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
+
+    if not os.path.exists(folder):
+        return http.JsonResponse(
+            {
+                "error": True,
+                "reason": "You must enable hosting at least once before you can download files.",
+            },
+            status=400,
+        )
+
+    file_path = request.GET["file_path"]
+
+    while file_path.startswith("/"):
+        file_path = file_path[1:]
+
+    requested_path = os.path.join(folder, file_path)
+
+    if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
+        print(
+            requested_path,
+            os.path.realpath(requested_path),
+            os.path.commonprefix((os.path.realpath(requested_path), folder)),
+            folder,
+        )
+        return http.JsonResponse(
+            {"error": True, "reason": "Invalid file path."}, status=400
+        )
+
+    if not os.path.exists(os.path.join(folder, file_path)):
+        return http.JsonResponse(
+            {"error": True, "reason": "File does not exist."}, status=400
+        )
+
+    with open(os.path.join(folder, file_path), "rb") as f:
+        return http.HttpResponse(
+            f.read(),
+            content_type="application/octet-stream",
+            headers={
+                "Content-Disposition": f"attachment; filename={file_path.split('/')[-1]}"
+            },
+        )
+
+
+# POST /api/v3/selfbot/hosting/delete-file
+def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
+    user: User = request.user
+
+    if user.key is None:
+        return http.JsonResponse(
+            {"error": True, "reason": "You must have a license key to use hosting."},
+            status=400,
+        )
+
+    folder_name = (
+        "".join(c for c in request.user.username if c.isalnum())
+        + "-"
+        + str(request.user.id)
+    )
+
+    folder = os.path.join("/hosting", folder_name, "LightningBot")
+
+    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
+
+    if not os.path.exists(folder):
+        return http.JsonResponse(
+            {
+                "error": True,
+                "reason": "You must enable hosting at least once before you can delete files.",
+            },
+            status=400,
+        )
+
+    file_path = request.POST["file_path"]
+
+    while file_path.startswith("/"):
+        file_path = file_path[1:]
+
+    requested_path = os.path.join(folder, file_path)
+
+    if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
+        print(
+            requested_path,
+            os.path.realpath(requested_path),
+            os.path.commonprefix((os.path.realpath(requested_path), folder)),
+            folder,
+        )
+        return http.JsonResponse(
+            {"error": True, "reason": "Invalid file path."}, status=400
+        )
+
+    if not os.path.exists(os.path.join(folder, file_path)):
+        return http.JsonResponse(
+            {"error": True, "reason": "File does not exist."}, status=400
+        )
+
+    os.remove(os.path.join(folder, file_path))
 
     return http.JsonResponse({"error": False})
 
