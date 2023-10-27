@@ -151,7 +151,7 @@ class CreditCardGenerator:
             num = f"0{num}"
         return num
 
-    def credit_card_number(self, prefix_list, length, brand):
+    def credit_card_number(self, prefix_list, length, brand, name="John Doe"):
         """
         Generate a credit card number with a specific prefix and length
         """
@@ -161,7 +161,7 @@ class CreditCardGenerator:
         cvv = str(self.random_int(100, 999, 3))
         exp = f"{self.random_int(1, 12, 2)}/{self.random_int(25, 30, 2)}"
 
-        vis = create_visualisation("John Doe", number, exp, cvv, brand)
+        vis = create_visualisation(name, number, exp, cvv, brand)
 
         return {
             "number": number,

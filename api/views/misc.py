@@ -12,6 +12,7 @@ from api.utils import creditcard_generator
 
 cc_generator = creditcard_generator.CreditCardGenerator()
 
+
 # /api/v3/misc/fml
 def fml(_request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -167,36 +168,38 @@ def ccgen(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
+    name = request.GET.get("name")
+
     credit_card: typing.Dict[str, str] = {}
 
     match credit_card_type:
         case "mastercard":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.mastercard_prefix_list, 16, "mastercard"
+                creditcard_generator.mastercard_prefix_list, 16, "mastercard", name
             )
         case "visa16":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.visa_prefix_list, 16, "visa"
+                creditcard_generator.visa_prefix_list, 16, "visa", name
             )
         case "visa13":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.visa_prefix_list, 13, "visa"
+                creditcard_generator.visa_prefix_list, 13, "visa", name
             )
         case "amex":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.amex_prefix_list, 15, "amex"
+                creditcard_generator.amex_prefix_list, 15, "amex", name
             )
         case "discover":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.discover_prefix_list, 16, "discover"
+                creditcard_generator.discover_prefix_list, 16, "discover", name
             )
         case "diners":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.diners_prefix_list, 14, "diners"
+                creditcard_generator.diners_prefix_list, 14, "diners", name
             )
         case "jcb":
             credit_card = cc_generator.credit_card_number(
-                creditcard_generator.jcb_prefix_list, 16, "jcb"
+                creditcard_generator.jcb_prefix_list, 16, "jcb", name
             )
 
     return http.JsonResponse({"status": 200, **credit_card})
@@ -216,7 +219,8 @@ reddit_headers = {
     "Upgrade-Insecure-Requests": "1",
 }
 
-# /api/v3/misc/ccgen
+
+# /api/v3/misc/meme
 def meme(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Meme generator
