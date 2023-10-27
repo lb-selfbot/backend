@@ -5,6 +5,7 @@ import random
 import tempfile
 import os
 from urllib.parse import quote
+from lxml.html.clean import clean_html
 
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -63,6 +64,8 @@ def _take_screenshot(url: str) -> bytes:
 def create_visualisation(name: str, number: int, exp: str, cvv: str, type: str) -> str:
     with open("templates/creditcard/page.html", "r") as f:
         page = f.read()
+    
+    name = clean_html(name)
 
     page = page.replace("{{name}}", name)
     page = page.replace("{{number}}", number)
