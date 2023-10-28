@@ -206,8 +206,6 @@ def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
-    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
-
     if not os.path.exists(folder):
         return http.JsonResponse(
             {
@@ -246,8 +244,6 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
     )
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
-
-    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
 
     if not os.path.exists(folder):
         return http.JsonResponse(
@@ -309,8 +305,6 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
-    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
-
     if not os.path.exists(folder):
         return http.JsonResponse(
             {
@@ -370,8 +364,6 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
     )
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
-
-    folder = r"C:\Users\kaani\AppData\Roaming\LightningBot"  # debug
 
     if not os.path.exists(folder):
         return http.JsonResponse(
