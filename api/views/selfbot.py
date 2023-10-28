@@ -158,7 +158,7 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
 def enable_hosting(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
-    if user.key is None:
+    if user.redeemed_key is None:
         return http.JsonResponse(
             {"error": True, "reason": "You must have a license key to use hosting."},
             status=400,
@@ -175,7 +175,7 @@ def enable_hosting(request: http.HttpRequest) -> http.HttpResponse:
 def disable_hosting(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
-    if user.key is None:
+    if user.redeemed_key is None:
         return http.JsonResponse(
             {"error": True, "reason": "You must have a license key to use hosting."},
             status=400,
@@ -192,7 +192,7 @@ def disable_hosting(request: http.HttpRequest) -> http.HttpResponse:
 def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
-    if user.key is None:
+    if user.redeemed_key is None:
         return http.JsonResponse(
             {"error": True, "reason": "You must have a license key to use hosting."},
             status=400,
@@ -233,7 +233,7 @@ def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
 def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
-    if user.key is None:
+    if user.redeemed_key is None:
         return http.JsonResponse(
             {"error": True, "reason": "You must have a license key to use hosting."},
             status=400,
@@ -295,7 +295,7 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
 def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
-    if user.key is None:
+    if user.redeemed_key is None:
         return http.JsonResponse(
             {"error": True, "reason": "You must have a license key to use hosting."},
             status=400,
@@ -357,7 +357,7 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
 def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
-    if user.key is None:
+    if user.redeemed_key is None:
         return http.JsonResponse(
             {"error": True, "reason": "You must have a license key to use hosting."},
             status=400,
