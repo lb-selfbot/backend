@@ -424,6 +424,13 @@ routes = [
         flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
     ),
     Route(
+        "v3/admin/table-data/credit-keys",
+        views.admin.table_data_credit_keys,
+        name="Table Data - Credit Keys",
+        methods=["GET"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.ADMIN_REQUIRED,
+    ),
+    Route(
         "v3/admin/table-data/orders",
         views.admin.table_data_orders,
         name="Table Data - Orders",
@@ -451,6 +458,16 @@ routes = [
         "v3/admin/action/key",
         views.admin.action_key,
         name="Table Action - Key",
+        methods=["POST"],
+        required_json_fields=["str:action", "int:key_id"],
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
+    ),
+    Route(
+        "v3/admin/action/credit-key",
+        views.admin.action_credit_key,
+        name="Table Action - Credit Key",
         methods=["POST"],
         required_json_fields=["str:action", "int:key_id"],
         flags=RouteFlags.LOGIN_REQUIRED

@@ -9,7 +9,7 @@ from django.utils import timezone
 from lightningbot import settings
 
 from ..utils import keys, github, misc, password_reset, logs
-from ..models import User, Key, Order, Release
+from ..models import User, CreditKey, Key, Order, Release
 
 
 # POST /api/v3/admin/create-key
@@ -77,7 +77,7 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
             {"error": True, "message": f"Failed to download artifact: {exc}"},
             status=500,
         )
-    
+
     if branch == "selfbot" and os.path.isfile("/hosting/LB-Selfbot-New"):
         os.rename("/hosting/LB-Selfbot-New", "/hosting/LB-Selfbot")
         os.system("sudo systemctl restart lightningbot-hosting")
@@ -187,6 +187,12 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
         if user.is_superuser:
             flags.append("Superuser")
 
+        if user.is_hosting:
+            flags.append("Hosting")
+
+        if user.hosting_lifetime:
+            flags.append("Lifetime Hosting")
+
         users.append(
             {
                 "id": user.id,
@@ -196,6 +202,9 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
                 "key": user.redeemed_key.key if user.redeemed_key else "None",
                 "accountType": user.account_type,
                 "flags": ", ".join(flags),
+                "hostingCredit": misc.seconds_to_readable_time(
+                    user.hosting_credit * 60
+                ),
                 "createdAt": misc.format_datetime(user.created_at),
             }
         )
@@ -246,6 +255,31 @@ def table_data_keys(_request: http.HttpRequest) -> http.HttpResponse:
                 "createdBy": key.created_by,
                 "createdAt": misc.format_datetime(key.created_at),
                 "createReason": key.create_reason,
+                "redeemedBy": key.redeemed_by.username if key.redeemed_by else "None",
+            }
+        )
+
+    return http.JsonResponse({"error": False, "data": key_data})
+
+
+# POST /api/v3/admin/table-data/credit_keys
+def table_data_credit_keys(_request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Get table data for credit keys
+    """
+    key_data = []
+
+    for key in CreditKey.objects.all():
+        key_data.append(
+            {
+                "id": key.id,
+                "key": key.key,
+                "createdBy": key.created_by,
+                "createdAt": misc.format_datetime(key.created_at),
+                "createReason": key.create_reason,
+                "creditAmount": "Lifetime"
+                if key.is_lifetime
+                else misc.seconds_to_readable_time(key.credit_amount * 60),
                 "redeemedBy": key.redeemed_by.username if key.redeemed_by else "None",
             }
         )
@@ -403,6 +437,40 @@ def action_key(request: http.HttpRequest) -> http.HttpResponse:
             "key": key.key,
             "key_id": key.id,
             "action": action,
+            "type": "normal_key",
+        },
+    )
+
+    return http.JsonResponse({"error": False})
+
+
+# POST /api/v3/admin/action/credit_key
+def action_credit_key(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Credit key actions
+    """
+    action: str = request.POST.get("action")
+    key_id: int = request.POST.get("key_id")
+
+    try:
+        key = CreditKey.objects.get(id=key_id)
+    except Key.DoesNotExist:
+        return http.JsonResponse(
+            {"error": True, "message": "Key does not exist!"}, status=404
+        )
+
+    match action:
+        case "delete":
+            key.delete()
+
+    logs.create_entry(
+        log_type="admin_user_action",
+        user=request.user,
+        info={
+            "key": key.key,
+            "key_id": key.id,
+            "action": action,
+            "type": "credit_key",
         },
     )
 
