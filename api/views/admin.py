@@ -202,9 +202,9 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
                 "key": user.redeemed_key.key if user.redeemed_key else "None",
                 "accountType": user.account_type,
                 "flags": ", ".join(flags),
-                "hostingCredit": misc.seconds_to_readable_time(
-                    user.hosting_credit * 60
-                ),
+                "hostingCredit": "Lifetime"
+                if user.hosting_lifetime
+                else misc.seconds_to_readable_time(user.hosting_credit * 60),
                 "createdAt": misc.format_datetime(user.created_at),
             }
         )
