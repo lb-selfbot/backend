@@ -45,7 +45,7 @@ def create_key(user: User = None, key=None, create_reason="", created_by="") -> 
     return key
 
 
-def create_credit_key(create_reason="", created_by="", credit_amount=0) -> CreditKey:
+def create_credit_key(create_reason="", created_by="", credit_amount=0, is_lifetime=False) -> CreditKey:
     """
     Create a credit key
     """
@@ -53,6 +53,7 @@ def create_credit_key(create_reason="", created_by="", credit_amount=0) -> Credi
         key=_generate_key(),
         created_by=created_by,
         create_reason=create_reason,
+        is_lifetime=is_lifetime,
         credit_amount=credit_amount,
     )
 
@@ -64,6 +65,7 @@ def create_credit_key(create_reason="", created_by="", credit_amount=0) -> Credi
             "create_reason": create_reason,
             "created_by": created_by,
             "credit_amount": credit_amount,
+            "is_lifetime": is_lifetime,
         },
     )
 
