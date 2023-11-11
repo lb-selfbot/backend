@@ -114,6 +114,8 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
     key.save()
 
     request.user.hosting_credit += key.credit_amount
+    if key.is_lifetime:
+        request.user.hosting_lifetime = True
     request.user.save()
 
     logs.create_entry(

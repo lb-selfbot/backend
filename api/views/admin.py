@@ -33,6 +33,7 @@ def create_credit_key(request: http.HttpRequest) -> http.HttpResponse:
         create_reason="Admin Create Key",
         created_by=request.user.username,
         credit_amount=int(request.POST["credit_amount"]),
+        is_lifetime=request.POST["is_lifetime"] == "true",
     )
 
     return http.JsonResponse({"error": False, "key": key.key})

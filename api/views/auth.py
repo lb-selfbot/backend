@@ -342,6 +342,7 @@ def get_user(request: http.HttpRequest) -> http.HttpResponse:
                 "last_selfbot_login": request.user.last_selfbot_login,
                 "is_hosting": request.user.is_hosting,
                 "hosting_credit": request.user.hosting_credit,
+                "hosting_lifetime": request.user.hosting_lifetime,
             },
         }
     )

@@ -28,6 +28,7 @@ class User(AbstractUser):
     # Hosting
     is_hosting = models.BooleanField(default=False)
     hosting_credit = models.IntegerField(default=0)  # In minutes
+    hosting_lifetime = models.BooleanField(default=False)
     hosting_token = models.CharField(max_length=512, default="")  # RSA encrypted token
 
 
@@ -87,6 +88,7 @@ class CreditKey(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     create_reason = models.TextField(default="")
     credit_amount = models.IntegerField(default=0)
+    is_lifetime = models.BooleanField(default=False)
     redeemed_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True
     )
