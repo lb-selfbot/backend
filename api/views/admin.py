@@ -31,6 +31,8 @@ def get_flags(user: User) -> list[str]:
 
     if user.hosting_lifetime:
         flags.append("Lifetime Hosting")
+    
+    return flags
 
 
 # POST /api/v3/admin/create-key
