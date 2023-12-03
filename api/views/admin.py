@@ -11,6 +11,7 @@ from lightningbot import settings
 from ..utils import keys, github, misc, password_reset, logs
 from ..models import User, CreditKey, Key, Order, Release
 
+
 def get_flags(user: User) -> list[str]:
     flags = []
 
@@ -31,7 +32,7 @@ def get_flags(user: User) -> list[str]:
 
     if user.hosting_lifetime:
         flags.append("Lifetime Hosting")
-    
+
     return flags
 
 
@@ -184,6 +185,26 @@ def deploy_docs(request: http.HttpRequest) -> http.HttpResponse:
     )
 
     return http.JsonResponse({"error": False})
+
+
+# POST /api/v3/admin/provide-hosting-credit
+def provide_hosting_credit(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Provide Hosting Credit
+    """
+    if not request.user.is_superuser:
+        return http.JsonResponse(
+            {"error": True, "message": "Not authorized"}, status=403
+        )
+
+    credit_amount: int = request.POST.get("credit_amount")
+
+    for user in User.objects.all():
+        if user.redeemed_key is None:
+            continue
+
+        user.hosting_credit += credit_amount
+        user.save()
 
 
 # POST /api/v3/admin/table-data/users

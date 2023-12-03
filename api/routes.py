@@ -403,6 +403,16 @@ routes = [
         | RouteFlags.JSON_REQUIRED,
     ),
     Route(
+        "v3/admin/provide-hosting-credit",
+        views.admin.provide_hosting_credit,
+        name="Provide Hosting Credit",
+        methods=["POST"],
+        required_json_fields=["int:credit_amount"],
+        flags=RouteFlags.LOGIN_REQUIRED
+        | RouteFlags.ADMIN_REQUIRED
+        | RouteFlags.JSON_REQUIRED,
+    ),
+    Route(
         "v3/admin/table-data/users",
         views.admin.table_data_users,
         name="Table Data - Users",
