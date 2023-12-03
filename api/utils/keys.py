@@ -28,7 +28,7 @@ def create_key(user: User = None, key=None, create_reason="", created_by="") -> 
     if user:
         user.redeemed_key = key
         user.account_type = "Premium"
-        user.hosting_credit += 7 * 24 * 60  # 1 week
+        user.hosting_credit += 31 * 24 * 60  # 1 month
         user.save()
 
     logs.create_entry(

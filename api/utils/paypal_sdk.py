@@ -82,7 +82,7 @@ class PayPalSDK:
             )
             user.redeemed_key = key_instance
             user.account_type = "Premium"
-            user.hosting_credit += 7 * 24 * 60 # 1 week
+            user.hosting_credit += 31 * 24 * 60 # 1 month
             user.email = response.raw_result["payer"]["email_address"]
             user.save()
 
