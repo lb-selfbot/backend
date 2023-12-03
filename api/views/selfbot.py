@@ -264,27 +264,21 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
     requested_path = os.path.join(folder, folder_path)
 
     if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
-        print(
-            requested_path,
-            os.path.realpath(requested_path),
-            os.path.commonprefix((os.path.realpath(requested_path), folder)),
-            folder,
-        )
         return http.JsonResponse(
             {"error": True, "reason": "Invalid folder path."}, status=400
         )
 
-    if not os.path.exists(os.path.join(folder, folder_path)):
+    if not os.path.exists(requested_path):
         return http.JsonResponse(
             {"error": True, "reason": "Folder does not exist."}, status=400
         )
 
-    if len(os.listdir(os.path.join(folder, folder_path))) != 0:
+    if len(os.listdir(requested_path)) != 0:
         return http.JsonResponse(
             {"error": True, "reason": "Folder is not empty."}, status=400
         )
 
-    os.rmdir(os.path.join(folder, folder_path))
+    os.rmdir(requested_path)
 
     return http.JsonResponse({"error": False})
 
@@ -324,12 +318,6 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
     requested_path = os.path.join(folder, file_path)
 
     if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
-        print(
-            requested_path,
-            os.path.realpath(requested_path),
-            os.path.commonprefix((os.path.realpath(requested_path), folder)),
-            folder,
-        )
         return http.JsonResponse(
             {"error": True, "reason": "Invalid file path."}, status=400
         )
@@ -384,22 +372,16 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
     requested_path = os.path.join(folder, file_path)
 
     if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
-        print(
-            requested_path,
-            os.path.realpath(requested_path),
-            os.path.commonprefix((os.path.realpath(requested_path), folder)),
-            folder,
-        )
         return http.JsonResponse(
             {"error": True, "reason": "Invalid file path."}, status=400
         )
 
-    if not os.path.exists(os.path.join(folder, file_path)):
+    if not os.path.exists(requested_path):
         return http.JsonResponse(
             {"error": True, "reason": "File does not exist."}, status=400
         )
 
-    os.remove(os.path.join(folder, file_path))
+    os.remove(requested_path)
 
     return http.JsonResponse({"error": False})
 

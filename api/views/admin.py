@@ -11,6 +11,27 @@ from lightningbot import settings
 from ..utils import keys, github, misc, password_reset, logs
 from ..models import User, CreditKey, Key, Order, Release
 
+def get_flags(user: User) -> list[str]:
+    flags = []
+
+    if user.is_active:
+        flags.append("Active")
+
+    if user.is_staff:
+        flags.append("Staff")
+
+    if user.is_tester:
+        flags.append("Tester")
+
+    if user.is_superuser:
+        flags.append("Superuser")
+
+    if user.is_hosting:
+        flags.append("Hosting")
+
+    if user.hosting_lifetime:
+        flags.append("Lifetime Hosting")
+
 
 # POST /api/v3/admin/create-key
 def create_key(request: http.HttpRequest) -> http.HttpResponse:
@@ -173,25 +194,7 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
     for user in User.objects.all():
         login_time = misc.seconds_to_readable_time(user.login_time)
 
-        flags = []
-
-        if user.is_active:
-            flags.append("Active")
-
-        if user.is_staff:
-            flags.append("Staff")
-
-        if user.is_tester:
-            flags.append("Tester")
-
-        if user.is_superuser:
-            flags.append("Superuser")
-
-        if user.is_hosting:
-            flags.append("Hosting")
-
-        if user.hosting_lifetime:
-            flags.append("Lifetime Hosting")
+        flags = get_flags(user)
 
         users.append(
             {
@@ -225,12 +228,15 @@ def table_data_online_users(_request: http.HttpRequest) -> http.HttpResponse:
     for user in user_models.all():
         login_time = misc.seconds_to_readable_time(user.login_time)
 
+        flags = get_flags(user)
+
         users.append(
             {
                 "id": user.id,
                 "username": user.username,
                 "key": user.redeemed_key.key if user.redeemed_key else "None",
                 "accountType": user.account_type,
+                "flags": ", ".join(flags),
                 "loggedInAt": misc.format_datetime(user.last_selfbot_login),
                 "loginData": f"{user.logins} logins, logged in for {login_time}",
                 "lastPingAt": misc.format_datetime(user.last_selfbot_ping),
