@@ -2,6 +2,7 @@
 Selfbot API views
 """
 import os
+import re
 import time
 import json
 import base64
@@ -21,6 +22,24 @@ from api.models import User
 from clyde_bot.bot import ClydeJob, clyde_bot
 
 encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
+
+
+def clean_username(username: str) -> str:
+    # Replace invalid characters with underscores
+    cleaned = re.sub(r"[^a-zA-Z0-9\._-]", "_", username)
+
+    # Remove leading and trailing underscores
+    cleaned = cleaned.strip("_")
+
+    # Remove leading dot (if any)
+    if cleaned.startswith("."):
+        cleaned = cleaned[1:]
+
+    # Make sure the result is not "." or ".."
+    if cleaned == "" or cleaned == "." or cleaned == "..":
+        cleaned = "_"
+
+    return cleaned
 
 
 # POST /api/v3/selfbot/reset-hwid
@@ -200,11 +219,7 @@ def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        "".join(c for c in request.user.username if c.isalnum())
-        + "-"
-        + str(request.user.id)
-    )
+    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -239,11 +254,7 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        "".join(c for c in request.user.username if c.isalnum())
-        + "-"
-        + str(request.user.id)
-    )
+    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -293,11 +304,7 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        "".join(c for c in request.user.username if c.isalnum())
-        + "-"
-        + str(request.user.id)
-    )
+    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -347,11 +354,7 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        "".join(c for c in request.user.username if c.isalnum())
-        + "-"
-        + str(request.user.id)
-    )
+    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
