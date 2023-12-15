@@ -77,14 +77,11 @@ class PayPalSDK:
         key_instance = None
 
         if response.raw_result["status"] == "COMPLETED":
+            user.email = response.raw_result["payer"]["email_address"]
+
             key_instance = keys.create_key(
                 user=user, create_reason=f"Purchase ({order_id})", created_by="API"
             )
-            user.redeemed_key = key_instance
-            user.account_type = "Premium"
-            user.hosting_credit += 31 * 24 * 60 # 1 month
-            user.email = response.raw_result["payer"]["email_address"]
-            user.save()
 
         response.raw_result["key"] = key_instance.key if key_instance else ""
 
