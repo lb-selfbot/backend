@@ -19,7 +19,6 @@ from django import http
 from api.utils import keys, releases, logs, validation, obfuscation
 from api.utils.encryption import Encryption
 from api.models import User
-from clyde_bot.bot import ClydeJob, clyde_bot
 
 encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
 
@@ -478,28 +477,6 @@ def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
     image_key = "mp:external/" + proxy_url.split("external/")[-1]
 
     return http.JsonResponse({"error": False, "image_key": image_key})
-
-
-# POST /api/v3/selfbot/clyde
-def clyde(request: http.HttpRequest) -> http.HttpResponse:
-    """
-    Generate a Clyde (OpenAI) response
-    """
-    try:
-        message = request.POST["message"]
-
-        job = ClydeJob(request.user.username, message)
-
-        clyde_bot.tasks.sync_q.put(job)
-
-        response, error = clyde_bot.wait_for_response(job)
-
-        if error:
-            return http.JsonResponse({"error": True, "reason": response}, status=500)
-
-        return http.JsonResponse({"error": False, "response": response})
-    except Exception as e:
-        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
 
 
 # POST /api/v3/selfbot/ocr

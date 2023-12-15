@@ -15,13 +15,9 @@ from channels.sessions import SessionMiddlewareStack
 from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
 
-from clyde_bot.bot import run_clyde_bot
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lightningbot.settings")
 
 django_app = get_asgi_application()
-
-run_clyde_bot()
 
 import api.urls
 
