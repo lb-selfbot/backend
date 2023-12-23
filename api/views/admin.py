@@ -5,6 +5,7 @@ import os
 
 from django import http
 from django.utils import timezone
+from django_ratelimit.decorators import ratelimit
 
 from lightningbot import settings
 
@@ -37,6 +38,8 @@ def get_flags(user: User) -> list[str]:
 
 
 # POST /api/v3/admin/create-key
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def create_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Create a new API key for a user.
@@ -49,6 +52,8 @@ def create_key(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/create-credit-key
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def create_credit_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Create a new API key for a user.
@@ -64,6 +69,8 @@ def create_credit_key(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/create-release
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def create_release(request: http.HttpRequest) -> http.HttpResponse:
     """
     Create a new release
@@ -126,6 +133,8 @@ def create_release(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/delete-release
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def delete_release(request: http.HttpRequest) -> http.HttpResponse:
     """
     Delete a release
@@ -156,6 +165,8 @@ def delete_release(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/deploy-docs
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def deploy_docs(request: http.HttpRequest) -> http.HttpResponse:
     """
     Deploy docs
@@ -188,6 +199,8 @@ def deploy_docs(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/provide-hosting-credit
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def provide_hosting_credit(request: http.HttpRequest) -> http.HttpResponse:
     """
     Provide Hosting Credit
@@ -208,6 +221,8 @@ def provide_hosting_credit(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/table-data/users
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for users
@@ -239,6 +254,8 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/table-data/online-users
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def table_data_online_users(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for users
@@ -270,6 +287,8 @@ def table_data_online_users(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/table-data/keys
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def table_data_keys(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for keys
@@ -292,6 +311,8 @@ def table_data_keys(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/table-data/credit_keys
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def table_data_credit_keys(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for credit keys
@@ -317,6 +338,8 @@ def table_data_credit_keys(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/table-data/orders
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def table_data_orders(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for keys
@@ -340,6 +363,8 @@ def table_data_orders(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/table-data/releases
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def table_data_releases(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for keys
@@ -361,6 +386,8 @@ def table_data_releases(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/action/user
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def action_user(request: http.HttpRequest) -> http.HttpResponse:
     """
     User actions
@@ -433,6 +460,8 @@ def action_user(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/action/key
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def action_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Key actions
@@ -474,6 +503,8 @@ def action_key(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/admin/action/credit_key
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def action_credit_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Credit key actions

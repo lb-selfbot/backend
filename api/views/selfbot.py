@@ -14,6 +14,7 @@ import pytesseract
 from PIL import Image
 from io import BytesIO
 from django import http
+from django_ratelimit.decorators import ratelimit
 
 
 from api.utils import keys, releases, logs, validation, obfuscation
@@ -42,6 +43,8 @@ def clean_username(username: str) -> str:
 
 
 # POST /api/v3/selfbot/reset-hwid
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def reset_hwid(request: http.HttpRequest) -> http.HttpResponse:
     """
     Reset HWID
@@ -70,6 +73,8 @@ def reset_hwid(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/redeem-key
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Redeem a license key
@@ -108,6 +113,8 @@ def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/redeem-credit-key
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Redeem a credit key
@@ -146,6 +153,8 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/check-version
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def check_version(request: http.HttpRequest) -> http.HttpResponse:
     """
     Check the latest version of the bot
@@ -175,6 +184,8 @@ def check_version(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/enable-hosting
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def enable_hosting(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
@@ -192,6 +203,8 @@ def enable_hosting(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/disable-hosting
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def disable_hosting(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
@@ -209,6 +222,8 @@ def disable_hosting(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # GET /api/v3/selfbot/hosting/list-files
+@ratelimit(key="ip", rate="10/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
@@ -244,6 +259,8 @@ def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/hosting/delete-folder
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
@@ -294,6 +311,8 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # GET /api/v3/selfbot/hosting/download-file
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
@@ -316,7 +335,11 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    file_path = request.GET["file_path"]
+    file_path = request.GET.get("file_path", "")
+    if file_path == "":
+        return http.JsonResponse(
+            {"error": True, "reason": "Missing file path."}, status=400
+        )
 
     while file_path.startswith("/"):
         file_path = file_path[1:]
@@ -344,6 +367,8 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/hosting/delete-file
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
     user: User = request.user
 
@@ -389,6 +414,8 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/start-params
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def start_params(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Check start params
@@ -435,6 +462,8 @@ discord_headers = {
 
 
 # POST /api/v3/selfbot/gen-image-key
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
     """
     Generate an image key
@@ -480,6 +509,8 @@ def gen_image_key(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/ocr
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def ocr(request: http.HttpRequest) -> http.HttpResponse:
     """
     Extract text from an image
@@ -510,6 +541,8 @@ def ocr(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/selfbot/obfuscate
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
     """
     Obfuscate code

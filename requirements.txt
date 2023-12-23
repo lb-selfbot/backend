@@ -19,3 +19,4 @@ pytesseract
 pyobf2
 selenium
 webdriver-manager
+django-ratelimit

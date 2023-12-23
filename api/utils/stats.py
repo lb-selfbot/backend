@@ -10,15 +10,12 @@ from ..utils import misc, releases
 from ..models import User
 
 
-def all_stats(user: User) -> dict:
-    """
-    Get all stats
-    """
+def get_stats():
     latest_release = releases.get_latest("selfbot")
 
     latest_version = latest_release.version if latest_release else "Unknown"
 
-    stats = {
+    return {
         "auth": "Online",
         "version": latest_version,
         "users": User.objects.count(),
@@ -27,10 +24,26 @@ def all_stats(user: User) -> dict:
         "hosting_status": "Online",
     }
 
-    if user.is_staff or user.is_superuser:
-        stats["admin"] = admin_stats()
 
-    return stats
+stats = get_stats()
+last_stats_update = time.time()
+
+
+def all_stats(user: User) -> dict:
+    """
+    Get all stats
+    """
+    global last_stats_update, stats
+
+    if time.time() - last_stats_update > 60:
+        stats = get_stats()
+
+    user_stats = {**stats}
+
+    if user.is_staff or user.is_superuser:
+        user_stats["admin"] = admin_stats()
+
+    return user_stats
 
 
 def admin_stats() -> dict:

@@ -2,11 +2,14 @@
 API views for the Discord bot
 """
 from django import http
+from django_ratelimit.decorators import ratelimit
 
 from ..models import Transcript
 from ..utils import keys, misc
 
 
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def create_key(request: http.HttpRequest) -> http.JsonResponse:
     """
     Create a new license key
@@ -17,11 +20,13 @@ def create_key(request: http.HttpRequest) -> http.JsonResponse:
     return http.JsonResponse({"error": False, "key": key.key})
 
 
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def check_key(request: http.HttpRequest) -> http.JsonResponse:
     """
     Check if a key is valid
     """
-    key = request.GET.get("key")
+    key = request.GET.get("key", "")
     if key is None:
         return http.JsonResponse({"error": True, "rason": "Missing key"}, status=400)
 
@@ -55,6 +60,9 @@ def check_key(request: http.HttpRequest) -> http.JsonResponse:
         }
     )
 
+
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def create_transcript(request: http.HttpRequest) -> http.JsonResponse:
     """
     Create a transcript

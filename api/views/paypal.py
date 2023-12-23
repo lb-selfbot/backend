@@ -2,6 +2,7 @@
 PayPal API views
 """
 from django import http
+from django_ratelimit.decorators import ratelimit
 
 from paypalhttp import HttpError
 
@@ -10,6 +11,8 @@ from api.utils import validation
 
 
 # GET /api/v3/paypal/create_order
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def create_order(request: http.HttpRequest) -> http.HttpResponse:
     """
     Create a PayPal order
@@ -37,6 +40,8 @@ def create_order(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST /api/v3/paypal/capture_order
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def capture_order(request: http.HttpRequest) -> http.HttpResponse:
     """
     Capture a PayPal order

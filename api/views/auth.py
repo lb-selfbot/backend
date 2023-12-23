@@ -6,6 +6,7 @@ from django.contrib import auth
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
+from django_ratelimit.decorators import ratelimit
 
 from ..utils import password_reset
 from ..utils import validation
@@ -17,6 +18,8 @@ from ..models import User
 
 
 # /api/v3/auth/register
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def register(request: http.HttpRequest) -> http.HttpResponse:
     """
     Create an account
@@ -108,6 +111,8 @@ def register(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/auth/login
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def login(request: http.HttpRequest) -> http.HttpResponse:
     """
     Login to an account
@@ -152,6 +157,8 @@ def login(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/auth/logout
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def logout(request: http.HttpRequest) -> http.HttpResponse:
     """
     Log out of an account
@@ -162,6 +169,8 @@ def logout(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/auth/forgot-password
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def forgot_password(request: http.HttpRequest) -> http.HttpResponse:
     """
     Send a password reset email
@@ -207,6 +216,8 @@ def forgot_password(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/auth/reset-password
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def reset_password(request: http.HttpRequest) -> http.HttpResponse:
     """
     Reset password
@@ -275,6 +286,8 @@ def reset_password(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/auth/change-password
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def change_password(request: http.HttpRequest) -> http.HttpResponse:
     """
     Change password
@@ -317,6 +330,8 @@ def change_password(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/auth/get-user
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def get_user(request: http.HttpRequest) -> http.HttpResponse:
     """
     Get data about the current logged in user
@@ -349,6 +364,8 @@ def get_user(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/auth/set-email
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def set_email(request: http.HttpRequest) -> http.HttpResponse:
     """
     Set email address
@@ -383,6 +400,8 @@ def set_email(request: http.HttpRequest) -> http.HttpResponse:
 
 # /api/v3/auth/auth
 @csrf_exempt
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def auth_view(request: http.HttpRequest) -> http.HttpResponse:
     """
     Auth view

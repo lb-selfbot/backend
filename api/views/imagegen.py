@@ -3,6 +3,7 @@ Image generation API views
 """
 
 from django import http
+from django_ratelimit.decorators import ratelimit
 
 from imagegeneration import imagegeneration
 
@@ -26,6 +27,8 @@ def save_image(image: bytes, format: str) -> Image:
 
 
 # /api/v3/imagegen/achievement
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def achievement(request: http.HttpRequest) -> http.HttpResponse:
     """
     Minecraft achievement image
@@ -38,6 +41,8 @@ def achievement(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/amiajoke
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def amiajoke(request: http.HttpRequest) -> http.HttpResponse:
     """
     Am I a joke to you?
@@ -50,6 +55,8 @@ def amiajoke(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/bad
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def bad(request: http.HttpRequest) -> http.HttpResponse:
     """
     Bad
@@ -62,6 +69,8 @@ def bad(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/calling
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def calling(request: http.HttpRequest) -> http.HttpResponse:
     """
     Calling
@@ -74,6 +83,8 @@ def calling(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/captcha
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def captcha(request: http.HttpRequest) -> http.HttpResponse:
     """
     Captcha
@@ -86,6 +97,8 @@ def captcha(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/didyoumean
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def didyoumean(request: http.HttpRequest) -> http.HttpResponse:
     """
     Did you mean?
@@ -100,6 +113,8 @@ def didyoumean(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/drake
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def drake(request: http.HttpRequest) -> http.HttpResponse:
     """
     Drake meme
@@ -116,6 +131,8 @@ def drake(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/facts
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def facts(request: http.HttpRequest) -> http.HttpResponse:
     """
     Facts
@@ -128,6 +145,8 @@ def facts(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/filter
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def filter_image(request: http.HttpRequest) -> http.HttpResponse:
     """
     Filter
@@ -142,6 +161,8 @@ def filter_image(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/floor
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def floor(request: http.HttpRequest) -> http.HttpResponse:
     """
     Floor
@@ -156,6 +177,8 @@ def floor(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/jokeoverhead
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def jokeoverhead(request: http.HttpRequest) -> http.HttpResponse:
     """
     Joke overhead
@@ -168,6 +191,8 @@ def jokeoverhead(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/trash
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def trash(request: http.HttpRequest) -> http.HttpResponse:
     """
     Trash
@@ -182,6 +207,8 @@ def trash(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/pornhub
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def pornhub(request: http.HttpRequest) -> http.HttpResponse:
     """
     Pornhub
@@ -196,6 +223,8 @@ def pornhub(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/salty
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def salty(request: http.HttpRequest) -> http.HttpResponse:
     """
     Salty
@@ -208,6 +237,8 @@ def salty(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/scroll
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def scroll(request: http.HttpRequest) -> http.HttpResponse:
     """
     Scroll
@@ -220,6 +251,8 @@ def scroll(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/shame
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def shame(request: http.HttpRequest) -> http.HttpResponse:
     """
     Shame
@@ -232,6 +265,8 @@ def shame(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/ship
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def ship(request: http.HttpRequest) -> http.HttpResponse:
     """
     Ship
@@ -246,6 +281,8 @@ def ship(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/what
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def what(request: http.HttpRequest) -> http.HttpResponse:
     """
     What
@@ -258,6 +295,8 @@ def what(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/speechbubble
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
     """
     Speechbubble
@@ -276,6 +315,8 @@ def speechbubble(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/quote
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def quote(request: http.HttpRequest) -> http.HttpResponse:
     """
     Quote
@@ -293,6 +334,8 @@ def quote(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/discordquote
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def discordquote(request: http.HttpRequest) -> http.HttpResponse:
     """
     Quote
@@ -314,6 +357,8 @@ def discordquote(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/imagegen/view/image
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def view_image(_request: http.HttpRequest, image: str) -> http.HttpResponse:
     """
     View image

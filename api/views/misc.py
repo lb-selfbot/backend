@@ -6,6 +6,7 @@ import random
 import typing
 import requests
 from django import http
+from django_ratelimit.decorators import ratelimit
 import googlesearch
 from googlesearch.exceptions import GoogleSearchException
 from api.utils import creditcard_generator
@@ -14,6 +15,8 @@ cc_generator = creditcard_generator.CreditCardGenerator()
 
 
 # /api/v3/misc/fml
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def fml(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random Fuck My Life story
@@ -25,6 +28,8 @@ def fml(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/riddle
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def riddle(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random riddle
@@ -36,6 +41,8 @@ def riddle(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/joke
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def joke(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random joke
@@ -47,6 +54,8 @@ def joke(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/wyr
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def wyr(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random Would You Rather question
@@ -58,6 +67,8 @@ def wyr(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/topic
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def topic(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random conversation topic
@@ -69,6 +80,8 @@ def topic(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/breaking-bad-quote
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def breaking_bad_quote(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random Breaking Bad quote
@@ -80,6 +93,8 @@ def breaking_bad_quote(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/game-of-thrones-quote
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def game_of_thrones_quote(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random Game of Thrones quote
@@ -91,6 +106,8 @@ def game_of_thrones_quote(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/lucifer-quote
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def lucifer_quote(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Random Lucifer quote
@@ -102,9 +119,11 @@ def lucifer_quote(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/stranger-things-quote
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def stranger_things_quote(_request: http.HttpRequest) -> http.HttpResponse:
     """
-    Random Lucifer quote
+    Random Stranger Things quote
     """
     with open("./data/strangerthingsquotes.json", "r", encoding="utf8") as file:
         quotes_list: typing.List = json.load(file)
@@ -113,6 +132,8 @@ def stranger_things_quote(_request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/search
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def search(request: http.HttpRequest) -> http.HttpResponse:
     """
     Google search
@@ -145,6 +166,8 @@ def search(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # /api/v3/misc/ccgen
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def ccgen(request: http.HttpRequest) -> http.HttpResponse:
     """
     Credit card generator
@@ -221,6 +244,8 @@ reddit_headers = {
 
 
 # /api/v3/misc/meme
+@ratelimit(key="ip", rate="5/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="15/s", method=ratelimit.ALL, block=True)
 def meme(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Meme generator
