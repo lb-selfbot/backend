@@ -330,6 +330,14 @@ routes = [
         required_json_fields=["str:lang", "str:code"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/poketwo",
+        views.selfbot.poketwo,
+        name="PokeTwo AI",
+        methods=["POST"],
+        required_json_fields=["str:url"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",

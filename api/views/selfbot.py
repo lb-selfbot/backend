@@ -17,12 +17,11 @@ from django import http
 from django_ratelimit.decorators import ratelimit
 
 
-from api.utils import keys, releases, logs, validation, obfuscation, misc
+from api.utils import keys, releases, logs, validation, obfuscation, misc, ai
 from api.utils.encryption import Encryption
 from api.models import User
 
 encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
-
 
 
 # POST /api/v3/selfbot/reset-hwid
@@ -216,7 +215,9 @@ def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    folder_name = (
+        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    )
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -253,7 +254,9 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    folder_name = (
+        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    )
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -305,7 +308,9 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    folder_name = (
+        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    )
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -361,7 +366,9 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    folder_name = (
+        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    )
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -549,3 +556,18 @@ def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
         return http.JsonResponse({"error": False, "code": code})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
+
+# POST/api/v3/selfbot/poketwo
+@ratelimit(key="ip", rate="2/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
+def poketwo(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    PokeTwo AI
+    """
+
+    url = request.POST["url"]
+
+    label, confidence = ai.get_poketwo_prediction(url)
+
+    return http.JsonResponse({"error": False, "label": label, "confidence": confidence})
