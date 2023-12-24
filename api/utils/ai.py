@@ -18,7 +18,7 @@ def get_poketwo_prediction(url: str) -> tuple[str, float]:
     """
 
     try:
-        result = poketwo_client.predict(url)
+        result = poketwo_client.predict(url, api_name="/predict")
     except Exception as exc:
         raise Exception("Failed to get predictions") from exc
 
