@@ -559,7 +559,7 @@ def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
 
 
 # POST/api/v3/selfbot/poketwo
-@ratelimit(key="ip", rate="2/m", method=ratelimit.ALL, block=True)
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
 @ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
 def poketwo(request: http.HttpRequest) -> http.HttpResponse:
     """
