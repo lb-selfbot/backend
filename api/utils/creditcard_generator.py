@@ -11,7 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from lightningbot import settings
 
-ChromeDriverManager().install()
+ChromeDriverManager(driver_version="2.26").install()
 
 visa_prefix_list = [
     [4, 5, 3, 9],
