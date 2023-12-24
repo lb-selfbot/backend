@@ -26,7 +26,7 @@ class ApiMiddleware:
         """
         for route in routes.routes:
             match = route.get_path().resolve(path)
-            
+
             if match is not None:
                 return route
 
@@ -79,8 +79,8 @@ class ApiMiddleware:
                     return errors.login_required()
 
                 # Try to log in with username and password
-                username: str = request.POST.get("username")
-                password: str = request.POST.get("password")
+                username: str = request.POST.get("username", "")
+                password: str = request.POST.get("password", "")
 
                 user = auth.authenticate(request, username=username, password=password)
 

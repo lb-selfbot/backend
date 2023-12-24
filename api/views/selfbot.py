@@ -566,8 +566,13 @@ def poketwo(request: http.HttpRequest) -> http.HttpResponse:
     PokeTwo AI
     """
 
-    url = request.POST["url"]
+    url = request.POST.get("url", "")
+    if not url:
+        return http.JsonResponse({"error": True, "reason": "Missing image URL"}, status=400)
 
-    label, confidence = ai.get_poketwo_prediction(url)
+    try:
+        label, confidence = ai.get_poketwo_prediction(url)
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
 
     return http.JsonResponse({"error": False, "label": label, "confidence": confidence})
