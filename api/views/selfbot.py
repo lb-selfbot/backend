@@ -17,29 +17,12 @@ from django import http
 from django_ratelimit.decorators import ratelimit
 
 
-from api.utils import keys, releases, logs, validation, obfuscation
+from api.utils import keys, releases, logs, validation, obfuscation, misc
 from api.utils.encryption import Encryption
 from api.models import User
 
 encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
 
-
-def clean_username(username: str) -> str:
-    # Replace invalid characters with underscores
-    cleaned = re.sub(r"[^a-zA-Z0-9\._-]", "_", username)
-
-    # Remove leading and trailing underscores
-    cleaned = cleaned.strip("_")
-
-    # Remove leading dot (if any)
-    if cleaned.startswith("."):
-        cleaned = cleaned[1:]
-
-    # Make sure the result is not "." or ".."
-    if cleaned == "" or cleaned == "." or cleaned == "..":
-        cleaned = "_"
-
-    return cleaned
 
 
 # POST /api/v3/selfbot/reset-hwid
@@ -233,7 +216,7 @@ def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
+    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -270,7 +253,7 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
+    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -283,7 +266,7 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_path = request.POST["folder_path"]
+    folder_path = misc.clean_filename(request.POST["folder_path"], True)
 
     while folder_path.startswith("/"):
         folder_path = folder_path[1:]
@@ -322,7 +305,7 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
+    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -335,7 +318,7 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    file_path = request.GET.get("file_path", "")
+    file_path = misc.clean_filename(request.GET.get("file_path", ""))
     if file_path == "":
         return http.JsonResponse(
             {"error": True, "reason": "Missing file path."}, status=400
@@ -378,7 +361,7 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = clean_username(request.user.username) + "-" + str(request.user.id)
+    folder_name = misc.clean_filename(request.user.username) + "-" + str(request.user.id)
 
     folder = os.path.join("/hosting", folder_name, "LightningBot")
 
@@ -391,7 +374,7 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    file_path = request.POST["file_path"]
+    file_path = misc.clean_filename(request.POST["file_path"])
 
     while file_path.startswith("/"):
         file_path = file_path[1:]

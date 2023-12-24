@@ -85,7 +85,7 @@ def get_rpm() -> int:
     """
     if os.name == "nt":
         return 0
-    
+
     nginx_access_log = "/var/log/nginx/access.log"
 
     with open(nginx_access_log, "r", encoding="utf8") as file:
@@ -108,3 +108,28 @@ def get_rpm() -> int:
             requests_in_last_10_minutes.append(line)
 
     return len(requests_in_last_10_minutes) / 10
+
+
+def clean_filename(filename: str, is_folder: bool = False) -> str:
+    """
+    Clean a filename
+    """
+    pattern = r"[^a-zA-Z0-9\._-]"
+    if is_folder:
+        pattern = r"[^a-zA-Z0-9\._-\/]"
+
+    # Replace invalid characters with underscores
+    cleaned = re.sub(pattern, "_", filename)
+
+    # Remove leading and trailing underscores
+    cleaned = cleaned.strip("_")
+
+    # Remove leading dot (if any)
+    if cleaned.startswith("."):
+        cleaned = cleaned[1:]
+
+    # Make sure the result is not "." or ".."
+    if cleaned == "" or cleaned == "." or cleaned == "..":
+        cleaned = "_"
+
+    return cleaned
