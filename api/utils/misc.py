@@ -13,6 +13,8 @@ import PIL.Image
 
 from django import http
 
+from api.models import User
+
 
 def get_user_ip(request: http.HttpRequest) -> str:
     """
@@ -133,3 +135,10 @@ def clean_filename(filename: str, is_folder: bool = False) -> str:
         cleaned = "_"
 
     return cleaned
+
+
+def is_user_allowed_to_start_free_trial(user: User, computer_name: str) -> bool:
+    """
+    Check if a user is allowed to use the free trial
+    """
+    

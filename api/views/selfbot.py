@@ -17,7 +17,7 @@ from django import http
 from django_ratelimit.decorators import ratelimit
 
 
-from api.utils import keys, releases, logs, validation, obfuscation, misc, ai
+from api.utils import keys, releases, logs, validation, obfuscation, misc
 from api.utils.encryption import Encryption
 from api.models import User
 
@@ -556,23 +556,3 @@ def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
         return http.JsonResponse({"error": False, "code": code})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
-
-
-# POST/api/v3/selfbot/poketwo
-@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
-@ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
-def poketwo(request: http.HttpRequest) -> http.HttpResponse:
-    """
-    PokeTwo AI
-    """
-
-    url = request.POST.get("url", "")
-    if not url:
-        return http.JsonResponse({"error": True, "reason": "Missing image URL"}, status=400)
-
-    try:
-        label, confidence = ai.get_poketwo_prediction(url)
-    except Exception as e:
-        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
-
-    return http.JsonResponse({"error": False, "label": label, "confidence": confidence})

@@ -15,7 +15,7 @@ from django.contrib import auth
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from ..utils import logs
+from ..utils import logs, misc
 from ..utils.encryption import Encryption
 
 from ..models import User
@@ -88,6 +88,7 @@ class SelfbotConsumer(WebsocketConsumer):
         """
         Called when a WebSocket connection is opened.
         """
+        print(self.scope)
         self.accept()
 
     def disconnect(self, code):
@@ -115,6 +116,17 @@ class SelfbotConsumer(WebsocketConsumer):
         if self.django_user.redeemed_key is None:
             # User has not redeemed a key, check for free trial
             if self.django_user.free_trial_expiry == 0:
+                allowed, reason = misc.is_user_allowed_free_trial(
+                    self.django_user, self.computer_name
+                )
+                if not allowed:
+                    logs.create_entry(
+                        log_type="free_trial_denied",
+                        user=self.django_user,
+                        info={"reason": reason},
+                    )
+                    return 3011
+
                 # Start free trial (7 days)
                 self.django_user.free_trial_expiry = int(time.time()) + 86400 * 7
                 self.django_user.account_type = "Free Trial"
