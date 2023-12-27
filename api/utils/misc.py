@@ -6,6 +6,7 @@ import re
 import io
 import random
 import string
+import hashlib
 import datetime
 
 import PIL
@@ -13,7 +14,7 @@ import PIL.Image
 
 from django import http
 
-from api.models import User
+from api.models import User, FreeTrial
 
 
 def get_user_ip(request: http.HttpRequest) -> str:
@@ -137,8 +138,32 @@ def clean_filename(filename: str, is_folder: bool = False) -> str:
     return cleaned
 
 
-def is_user_allowed_to_start_free_trial(user: User, computer_name: str) -> bool:
+def is_user_allowed_trial(
+    user: User, computer_name: str, client_ip: str
+) -> tuple[bool, str]:
     """
     Check if a user is allowed to use the free trial
     """
-    
+    # check if user has already used the free trial
+    computer_name_hash = hashlib.sha1(computer_name.encode()).hexdigest()
+    if (
+        FreeTrial.objects.filter(computer_name_hash=computer_name_hash).exists()
+        and computer_name != ""
+    ):
+        return False, "COMPUTER_NAME_MATCH"
+
+    client_ip_hash = hashlib.sha1(client_ip.encode()).hexdigest()
+    if (
+        FreeTrial.objects.filter(client_ip_hash=client_ip_hash).exists()
+        and client_ip != ""
+    ):
+        return False, "CLIENT_IP_MATCH"
+
+    # create free trial for user
+    FreeTrial.objects.create(
+        user=user,
+        computer_name_hash=computer_name_hash,
+        client_ip_hash=client_ip_hash,
+    )
+
+    return True, ""

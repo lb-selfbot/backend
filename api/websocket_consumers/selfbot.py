@@ -38,6 +38,9 @@ class SelfbotConsumer(WebsocketConsumer):
         self.computer_name: str = None
         self.console_text: str = None
 
+        self.headers = {}
+        self.client_ip = ""
+
         self.instance_id = random.choices(string.ascii_letters + string.digits, k=50)
 
     def group_add(self, group_name: str, channel_name: str):
@@ -84,11 +87,28 @@ class SelfbotConsumer(WebsocketConsumer):
             self.group_discard(self.group_name, self.channel_name)
         self.close(code)
 
+    def decode_headers(self):
+        """
+        Get the IP address of the user
+        """
+        # Decode headers
+        for header in self.scope["headers"]:
+            self.headers[header[0].decode("utf-8")] = header[1].decode("utf-8")
+
+        # Get client IP
+        if (ip := self.headers.get("x-forwarded-for", "")) != "":
+            self.client_ip = ip.split(",")[0]
+        elif (ip := self.headers.get("cf-connecting-ip", "")) != "":
+            self.client_ip = ip
+        else:
+            self.client_ip = self.scope["client"][0]
+
     def connect(self):
         """
         Called when a WebSocket connection is opened.
         """
-        print(self.scope)
+        self.decode_headers()
+
         self.accept()
 
     def disconnect(self, code):
@@ -116,8 +136,8 @@ class SelfbotConsumer(WebsocketConsumer):
         if self.django_user.redeemed_key is None:
             # User has not redeemed a key, check for free trial
             if self.django_user.free_trial_expiry == 0:
-                allowed, reason = misc.is_user_allowed_free_trial(
-                    self.django_user, self.computer_name
+                allowed, reason = misc.is_user_allowed_trial(
+                    self.django_user, self.computer_name, self.client_ip
                 )
                 if not allowed:
                     logs.create_entry(

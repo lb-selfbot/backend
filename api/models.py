@@ -149,3 +149,17 @@ class Image(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.format} - {self.created_at}"
+
+
+class FreeTrial(models.Model):
+    """
+    Free trial model
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    computer_name_hash = models.CharField(max_length=255, default="")
+    client_ip_hash = models.CharField(max_length=255, default="")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.created_at}"
