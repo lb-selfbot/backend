@@ -119,7 +119,7 @@ def clean_filename(filename: str, is_folder: bool = False) -> str:
     """
     pattern = r"[^a-zA-Z0-9\._-]"
     if is_folder:
-        pattern = r"[^a-zA-Z0-9\._-\/]"
+        pattern = r"[^a-zA-Z0-9\._/-]"
 
     # Replace invalid characters with underscores
     cleaned = re.sub(pattern, "_", filename)

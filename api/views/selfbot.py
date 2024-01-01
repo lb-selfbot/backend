@@ -269,7 +269,7 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_path = misc.clean_filename(request.POST["folder_path"], True)
+    folder_path = misc.clean_filename(request.POST["folder_path"], is_folder=True)
 
     while folder_path.startswith("/"):
         folder_path = folder_path[1:]
@@ -323,7 +323,7 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    file_path = misc.clean_filename(request.GET.get("file_path", ""))
+    file_path = misc.clean_filename(request.GET.get("file_path", ""), is_folder=True)
     if file_path == "":
         return http.JsonResponse(
             {"error": True, "reason": "Missing file path."}, status=400
@@ -381,7 +381,7 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    file_path = misc.clean_filename(request.POST["file_path"])
+    file_path = misc.clean_filename(request.POST["file_path"], is_folder=True)
 
     while file_path.startswith("/"):
         file_path = file_path[1:]
