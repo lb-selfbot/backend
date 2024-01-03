@@ -251,7 +251,7 @@ class AlexFlipNote:
             face = face.filter(PIL.ImageFilter.GaussianBlur(radius=1.5))
             face = face.resize((int(width * 1.25), int(height / 1.5)))
         else:
-            filter_image = PIL.Image.open(self._get_file(f"filter/{filter_type}.png"))
+            filter_image = PIL.Image.open(f"assets/filter/{filter_type}.png")
             filter_image = filter_image.resize((width, height))
 
             face.paste(filter_image, (0, 0), filter_image)
