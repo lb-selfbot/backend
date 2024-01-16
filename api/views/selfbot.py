@@ -8,6 +8,7 @@ import json
 import base64
 import asyncio
 import hashlib
+from datetime import datetime
 
 import requests
 import pytesseract
@@ -114,18 +115,30 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
     
-    if request.POST["key"] == "LB-DOWNTIME-16-01-2024":
+    promotion_keys = [
+        ("LB-DOWNTIME-16-01-2024", datetime(2024, 2, 1, 0, 0, 0), 31 * 24 * 60),
+    ]
+
+    for key, date, amount in promotion_keys:
+        if key != request.POST["key"]:
+            continue
+
+        if datetime.now() > date:
+            return http.JsonResponse({"error": True, "message": "This promotion has expired."}, status=400)
+        
+        create_reason = f"Promotion: {key}"
+
         try:
-            CreditKey.objects.get(create_reason="Downtime compensation", redeemed_by=request.user)
+            CreditKey.objects.get(create_reason=create_reason, redeemed_by=request.user)
         except CreditKey.DoesNotExist:
             pass
         else:
             return http.JsonResponse({"error": True, "message": "You have already used this promotion."}, status=400)
 
         key = keys.create_credit_key(
-            create_reason="Downtime compensation",
+            create_reason=create_reason,
             created_by="API",
-            credit_amount=31 * 24 * 60,
+            credit_amount=amount,
         )
 
     if key is None:
