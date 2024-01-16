@@ -19,7 +19,7 @@ from django_ratelimit.decorators import ratelimit
 
 from api.utils import keys, releases, logs, validation, obfuscation, misc
 from api.utils.encryption import Encryption
-from api.models import User
+from api.models import User, CreditKey
 
 encryption = Encryption("NH62@Yyy5#5hsE56@S9*g2NY#11N$gguODE40QZ67kav1BvUHe")
 
@@ -112,6 +112,20 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
                 "message": "Invalid captcha response.",
             },
             status=400,
+        )
+    
+    if request.POST["key"] == "LB-DOWNTIME-16-01-2024":
+        try:
+            CreditKey.objects.get(create_reason="Downtime compensation", redeemed_by=request.user)
+        except CreditKey.DoesNotExist:
+            pass
+        else:
+            return http.JsonResponse({"error": True, "message": "You have already used this promotion."}, status=400)
+
+        key = keys.create_credit_key(
+            create_reason="Downtime compensation",
+            created_by="API",
+            credit_amount=31 * 24 * 60,
         )
 
     if key is None:
