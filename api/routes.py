@@ -330,6 +330,14 @@ routes = [
         required_json_fields=["str:lang", "str:code"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/gpt",
+        views.selfbot.gpt,
+        name="GPT",
+        methods=["POST"],
+        required_json_fields=["str:model"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",

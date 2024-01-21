@@ -10,6 +10,7 @@ import asyncio
 import hashlib
 from datetime import datetime
 
+import g4f
 import requests
 import pytesseract
 from PIL import Image
@@ -581,5 +582,23 @@ def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
                 )
 
         return http.JsonResponse({"error": False, "code": code})
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
+# POST /api/v3/selfbot/gpt
+@ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
+def gpt(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Generate text
+    """
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        del data["username"]
+        del data["password"]
+
+        response = g4f.ChatCompletion.create(**data)
+
+        return http.JsonResponse({"error": False, "response": response})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
