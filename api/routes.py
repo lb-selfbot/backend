@@ -336,7 +336,7 @@ routes = [
         name="GPT",
         methods=["POST"],
         required_json_fields=["str:model"],
-        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+        flags=RouteFlags.JSON_REQUIRED,
     ),
     # PayPal
     Route(
