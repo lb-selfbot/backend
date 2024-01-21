@@ -120,14 +120,14 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
         ("LB-DOWNTIME-16-01-2024", datetime(2024, 2, 1, 0, 0, 0), 31 * 24 * 60),
     ]
 
-    for key, date, amount in promotion_keys:
-        if key != request.POST["key"]:
+    for pkey, date, amount in promotion_keys:
+        if pkey != request.POST["key"]:
             continue
 
         if datetime.now() > date:
             return http.JsonResponse({"error": True, "message": "This promotion has expired."}, status=400)
         
-        create_reason = f"Promotion: {key}"
+        create_reason = f"Promotion: {pkey}"
 
         try:
             CreditKey.objects.get(create_reason=create_reason, redeemed_by=request.user)
