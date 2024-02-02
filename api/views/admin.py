@@ -230,11 +230,6 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for users
     """
-    cached_data = cache.get("table_data_users")
-    if cached_data:
-        return http.JsonResponse({"error": False, "data": cached_data})
-
-    # Fetch users with selected fields
     users = User.objects.all().values(
         "id",
         "username",
@@ -255,7 +250,6 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
 
     formatted_users = []
     for user in users:
-        print(user, type(user))
         formatted_user = {}
 
         flags = []
@@ -296,8 +290,6 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
         formatted_user["createdAt"] = misc.format_datetime(user["created_at"])
 
         formatted_users.append(formatted_user)
-
-    cache.set("table_data_users", formatted_users, timeout=10)
 
     return http.JsonResponse({"error": False, "data": formatted_users})
 
