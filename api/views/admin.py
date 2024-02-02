@@ -255,6 +255,7 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
 
     formatted_users = []
     for user in users:
+        print(user, type(user))
         formatted_user = {}
 
         flags = []
@@ -277,11 +278,15 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
         if user["hosting_lifetime"]:
             flags.append("Lifetime Hosting")
 
+        formatted_user["id"] = user["id"]
+        formatted_user["username"] = user["username"]
         formatted_user["email"] = user["email"] or "None"
         formatted_user["loginData"] = (
             f"{user['logins']} logins, logged in for {misc.seconds_to_readable_time(user['login_time'])}"
         )
-        formatted_user["key"] = user["redeemed_key__key"] if user["redeemed_key__key"] else "None"
+        formatted_user["key"] = (
+            user["redeemed_key__key"] if user["redeemed_key__key"] else "None"
+        )
         formatted_user["flags"] = ", ".join(flags)
         formatted_user["hostingCredit"] = (
             "Lifetime"
