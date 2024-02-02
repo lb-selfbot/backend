@@ -22,3 +22,4 @@ webdriver-manager
 django-ratelimit
 gradio-client @ git+https://github.com/gradio-app/gradio@main#subdirectory=client/python
 g4f
+func-timeout

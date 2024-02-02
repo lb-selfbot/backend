@@ -107,7 +107,10 @@ def get_rpm() -> int:
         if not date_strings:
             continue
 
-        parsed_date = datetime.datetime.strptime(date_strings[0], "%d/%b/%Y:%H:%M:%S %z")
+        try:
+            parsed_date = datetime.datetime.strptime(date_strings[0], "%d/%b/%Y:%H:%M:%S %z")
+        except ValueError:
+            continue
 
         # check if parsed_date was in the last minute
         if now - parsed_date < datetime.timedelta(minutes=10):

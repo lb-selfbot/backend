@@ -9,6 +9,8 @@ import typing
 from django import http
 from django.contrib import auth
 
+from func_timeout import func_timeout, FunctionTimedOut
+
 from . import routes
 from .utils import errors
 
@@ -19,9 +21,16 @@ class ExceptionMiddleware:
 
     def __call__(self, request: http.HttpRequest) -> http.HttpResponse:
         try:
-            response = self.get_response(request)
+            response = func_timeout(30, self.get_response, (), {"request": request})
+        except FunctionTimedOut:
+            response = http.HttpResponseServerError(
+                "Oops! The request took too long to process."
+            )
         except Exception as e:
-            response = http.HttpResponseServerError("Oops! Something went wrong: " + str(e))
+            response = http.HttpResponseServerError(
+                "Oops! Something went wrong: " + str(e)
+            )
+
         return response
 
 

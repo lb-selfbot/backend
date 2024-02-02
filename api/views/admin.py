@@ -3,11 +3,9 @@ Admin API views
 """
 
 import os
-import time
 
 from django import http
 from django.utils import timezone
-from django.core.cache import cache
 from django_ratelimit.decorators import ratelimit
 
 from lightningbot import settings
