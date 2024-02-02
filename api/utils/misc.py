@@ -103,8 +103,11 @@ def get_rpm() -> int:
     requests_in_last_10_minutes = []
 
     for line in lines:
-        date_string = date_regex.findall(line)[0]
-        parsed_date = datetime.datetime.strptime(date_string, "%d/%b/%Y:%H:%M:%S %z")
+        date_strings = date_regex.findall(line)
+        if not date_strings:
+            continue
+
+        parsed_date = datetime.datetime.strptime(date_strings[0], "%d/%b/%Y:%H:%M:%S %z")
 
         # check if parsed_date was in the last minute
         if now - parsed_date < datetime.timedelta(minutes=10):
