@@ -1,10 +1,13 @@
 """
 Admin API views
 """
+
 import os
+import time
 
 from django import http
 from django.utils import timezone
+from django.core.cache import cache
 from django_ratelimit.decorators import ratelimit
 
 from lightningbot import settings
@@ -227,30 +230,71 @@ def table_data_users(_request: http.HttpRequest) -> http.HttpResponse:
     """
     Get table data for users
     """
-    users = []
+    cached_data = cache.get("table_data_users")
+    if cached_data:
+        return http.JsonResponse({"error": False, "data": cached_data})
 
-    for user in User.objects.all():
-        login_time = misc.seconds_to_readable_time(user.login_time)
+    # Fetch users with selected fields
+    users = User.objects.all().values(
+        "id",
+        "username",
+        "email",
+        "logins",
+        "login_time",
+        "redeemed_key__key",
+        "account_type",
+        "hosting_lifetime",
+        "hosting_credit",
+        "created_at",
+        "is_active",
+        "is_staff",
+        "is_tester",
+        "is_superuser",
+        "is_hosting",
+    )
 
-        flags = get_flags(user)
+    formatted_users = []
+    for user in users:
+        formatted_user = {}
 
-        users.append(
-            {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email or "None",
-                "loginData": f"{user.logins} logins, logged in for {login_time}",
-                "key": user.redeemed_key.key if user.redeemed_key else "None",
-                "accountType": user.account_type,
-                "flags": ", ".join(flags),
-                "hostingCredit": "Lifetime"
-                if user.hosting_lifetime
-                else misc.seconds_to_readable_time(user.hosting_credit * 60),
-                "createdAt": misc.format_datetime(user.created_at),
-            }
+        flags = []
+
+        if user["is_active"]:
+            flags.append("Active")
+
+        if user["is_staff"]:
+            flags.append("Staff")
+
+        if user["is_tester"]:
+            flags.append("Tester")
+
+        if user["is_superuser"]:
+            flags.append("Superuser")
+
+        if user["is_hosting"]:
+            flags.append("Hosting")
+
+        if user["hosting_lifetime"]:
+            flags.append("Lifetime Hosting")
+
+        formatted_user["email"] = user["email"] or "None"
+        formatted_user["loginData"] = (
+            f"{user['logins']} logins, logged in for {misc.seconds_to_readable_time(user['login_time'])}"
         )
+        formatted_user["key"] = user["redeemed_key__key"] if user["redeemed_key__key"] else "None"
+        formatted_user["flags"] = ", ".join(flags)
+        formatted_user["hostingCredit"] = (
+            "Lifetime"
+            if user["hosting_lifetime"]
+            else misc.seconds_to_readable_time(user["hosting_credit"] * 60)
+        )
+        formatted_user["createdAt"] = misc.format_datetime(user["created_at"])
 
-    return http.JsonResponse({"error": False, "data": users})
+        formatted_users.append(formatted_user)
+
+    cache.set("table_data_users", formatted_users, timeout=10)
+
+    return http.JsonResponse({"error": False, "data": formatted_users})
 
 
 # POST /api/v3/admin/table-data/online-users
@@ -327,9 +371,11 @@ def table_data_credit_keys(_request: http.HttpRequest) -> http.HttpResponse:
                 "createdBy": key.created_by,
                 "createdAt": misc.format_datetime(key.created_at),
                 "createReason": key.create_reason,
-                "creditAmount": "Lifetime"
-                if key.is_lifetime
-                else misc.seconds_to_readable_time(key.credit_amount * 60),
+                "creditAmount": (
+                    "Lifetime"
+                    if key.is_lifetime
+                    else misc.seconds_to_readable_time(key.credit_amount * 60)
+                ),
                 "redeemedBy": key.redeemed_by.username if key.redeemed_by else "None",
             }
         )
