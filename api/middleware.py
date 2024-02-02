@@ -1,6 +1,7 @@
 """
 Middlewares for the API
 """
+
 import os
 import json
 import typing
@@ -10,6 +11,18 @@ from django.contrib import auth
 
 from . import routes
 from .utils import errors
+
+
+class ExceptionMiddleware:
+    def __init__(self, get_response: typing.Callable):
+        self.get_response = get_response
+
+    def __call__(self, request: http.HttpRequest) -> http.HttpResponse:
+        try:
+            response = self.get_response(request)
+        except Exception as e:
+            response = http.HttpResponseServerError("Oops! Something went wrong: " + str(e))
+        return response
 
 
 class ApiMiddleware:
