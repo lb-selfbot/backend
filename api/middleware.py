@@ -19,6 +19,14 @@ class ExceptionMiddleware:
     def __init__(self, get_response: typing.Callable):
         self.get_response = get_response
 
+    def process_exception(self, request: http.HttpRequest, exception):
+        if not isinstance(exception, FunctionTimedOut):
+            return http.HttpResponseServerError(
+                "Oops! The request took too long to process."
+            )
+
+        return http.HttpResponseServerError("Oops! Something went wrong: " + str(e))
+
     def __call__(self, request: http.HttpRequest) -> http.HttpResponse:
         try:
             response = func_timeout(120, self.get_response, (), {"request": request})
