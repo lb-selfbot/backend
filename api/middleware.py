@@ -21,7 +21,7 @@ class ExceptionMiddleware:
 
     def __call__(self, request: http.HttpRequest) -> http.HttpResponse:
         try:
-            response = func_timeout(50, self.get_response, (), {"request": request})
+            response = func_timeout(120, self.get_response, (), {"request": request})
         except FunctionTimedOut:
             response = http.HttpResponseServerError(
                 "Oops! The request took too long to process."

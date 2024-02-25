@@ -1,6 +1,7 @@
 """
 Selfbot API views
 """
+
 import os
 import re
 import time
@@ -19,7 +20,7 @@ from django import http
 from django_ratelimit.decorators import ratelimit
 
 
-from api.utils import keys, releases, logs, validation, obfuscation, misc
+from api.utils import keys, releases, logs, validation, obfuscation, misc, captcha
 from api.utils.encryption import Encryption
 from api.models import User, CreditKey
 
@@ -115,7 +116,7 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
             },
             status=400,
         )
-    
+
     promotion_keys = [
         ("LB-DOWNTIME-16-01-2024", datetime(2024, 2, 1, 0, 0, 0), 31 * 24 * 60),
     ]
@@ -125,8 +126,10 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
             continue
 
         if datetime.now() > date:
-            return http.JsonResponse({"error": True, "message": "This promotion has expired."}, status=400)
-        
+            return http.JsonResponse(
+                {"error": True, "message": "This promotion has expired."}, status=400
+            )
+
         create_reason = f"Promotion: {pkey}"
 
         try:
@@ -134,7 +137,10 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
         except CreditKey.DoesNotExist:
             pass
         else:
-            return http.JsonResponse({"error": True, "message": "You have already used this promotion."}, status=400)
+            return http.JsonResponse(
+                {"error": True, "message": "You have already used this promotion."},
+                status=400,
+            )
 
         key = keys.create_credit_key(
             create_reason=create_reason,
@@ -585,6 +591,7 @@ def obfuscate(request: http.HttpRequest) -> http.HttpResponse:
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
 
+
 # POST /api/v3/selfbot/gpt
 @ratelimit(key="ip", rate="5/m", method=ratelimit.ALL, block=True)
 @ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
@@ -600,5 +607,25 @@ def gpt(request: http.HttpRequest) -> http.HttpResponse:
         response = g4f.ChatCompletion.create(**data)
 
         return http.JsonResponse({"error": False, "response": response})
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
+
+# POST /api/v3/selfbot/gpt
+# @ratelimit(key="ip", rate="1/m", method=ratelimit.ALL, block=True) TODO: rate limit
+@ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
+def poketwo_verify(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Verify a user with Poketwo
+    """
+    try:
+        user_id = request.POST["user_id"]
+        url = f"https://verify.poketwo.net/captcha/{user_id}"
+
+        captcha_response = captcha.solve_recaptchav2(
+            url, "6LfgtMoaAAAAAPB_6kwTMPj9HG_XxRLL7n92jYkD"
+        )
+
+        return http.JsonResponse({"error": False, "response": captcha_response})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)

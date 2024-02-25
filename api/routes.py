@@ -338,6 +338,14 @@ routes = [
         required_json_fields=["str:model"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/poketwo-verify",
+        views.selfbot.poketwo_verify,
+        name="PokéTwo Verify",
+        methods=["POST"],
+        required_json_fields=["str:user_id"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",
