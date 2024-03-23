@@ -345,7 +345,7 @@ routes = [
         name="PokéTwo Verify",
         methods=["POST"],
         required_json_fields=["str:user_id"],
-        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+        flags=RouteFlags.JSON_REQUIRED,
     ),
     Route(
         "v3/selfbot/poketwo-status",
@@ -353,7 +353,7 @@ routes = [
         name="PokéTwo Status",
         methods=["POST"],
         required_json_fields=["str:task_id"],
-        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+        flags=RouteFlags.JSON_REQUIRED,
     ),
     # PayPal
     Route(

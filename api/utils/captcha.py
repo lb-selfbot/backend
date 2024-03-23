@@ -25,13 +25,11 @@ def create_task_recaptchav2(url: str, site_key: str) -> str:
         "https://api.capmonster.cloud/createTask", json=payload, timeout=10
     )
 
-    print(resp.status_code, resp.text)
-
     task_id = resp.json()["taskId"]
     if not task_id:
         raise Exception("Failed to create task")
 
-    return task_id
+    return str(task_id)
 
 
 def get_task_status(task_id: str) -> str:

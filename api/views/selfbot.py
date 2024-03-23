@@ -622,11 +622,11 @@ def poketwo_verify(request: http.HttpRequest) -> http.HttpResponse:
         user_id = request.POST["user_id"]
         url = f"https://verify.poketwo.net/captcha/{user_id}"
 
-        captcha_response = captcha.create_task_recaptchav2(
+        task_id = captcha.create_task_recaptchav2(
             url, "6LfgtMoaAAAAAPB_6kwTMPj9HG_XxRLL7n92jYkD"
         )
 
-        return http.JsonResponse({"error": False, "response": captcha_response})
+        return http.JsonResponse({"error": False, "task_id": task_id})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
 
