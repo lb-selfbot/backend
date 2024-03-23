@@ -611,8 +611,8 @@ def gpt(request: http.HttpRequest) -> http.HttpResponse:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
 
 
-# POST /api/v3/selfbot/gpt
-# @ratelimit(key="ip", rate="1/m", method=ratelimit.ALL, block=True) TODO: rate limit
+# POST /api/v3/selfbot/poketwo-verify
+@ratelimit(key="ip", rate="1/m", method=ratelimit.ALL, block=True)
 @ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
 def poketwo_verify(request: http.HttpRequest) -> http.HttpResponse:
     """
@@ -622,10 +622,26 @@ def poketwo_verify(request: http.HttpRequest) -> http.HttpResponse:
         user_id = request.POST["user_id"]
         url = f"https://verify.poketwo.net/captcha/{user_id}"
 
-        captcha_response = captcha.solve_recaptchav2(
+        captcha_response = captcha.create_task_recaptchav2(
             url, "6LfgtMoaAAAAAPB_6kwTMPj9HG_XxRLL7n92jYkD"
         )
 
         return http.JsonResponse({"error": False, "response": captcha_response})
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
+# POST /api/v3/selfbot/poketwo-status
+@ratelimit(key="ip", rate="1/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
+def poketwo_status(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Check Poketwo verification status
+    """
+    try:
+        task_id = request.POST["task_id"]
+
+        status = captcha.get_task_status(task_id)
+
+        return http.JsonResponse({"error": False, **status})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)

@@ -7,10 +7,8 @@ import time
 
 import requests
 
-MAX_TRIES = 20
 
-
-def solve_recaptchav2(url: str, site_key: str) -> str:
+def create_task_recaptchav2(url: str, site_key: str) -> str:
     """
     Solve reCAPTCHA v2
     """
@@ -33,24 +31,27 @@ def solve_recaptchav2(url: str, site_key: str) -> str:
     if not task_id:
         raise Exception("Failed to create task")
 
+    return task_id
+
+
+def get_task_status(task_id: str) -> str:
+    """
+    Get task status
+    """
     payload = {
         "clientKey": os.environ.get("CAPMONSTER_API_KEY", ""),
         "taskId": task_id,
     }
 
-    # Wait for the task to be solved
-    for i in range(MAX_TRIES):
-        time.sleep(2 + i * 0.5)
+    resp = requests.get(
+        f"https://api.capmonster.cloud/getTaskResult",
+        json=payload,
+        timeout=10,
+    )
 
-        resp = requests.get(
-            f"https://api.capmonster.cloud/getTaskResult",
-            json=payload,
-            timeout=10,
-        )
+    status = {"status": resp.json()["status"], "solution": ""}
 
-        print(resp.status_code, resp.text)
+    if resp.json()["status"] == "ready":
+        status["solution"] = resp.json()["solution"]["gRecaptchaResponse"]
 
-        if resp.json()["status"] == "ready":
-            return resp.json()["solution"]["gRecaptchaResponse"]
-
-    raise Exception("Failed to solve task")
+    return status
