@@ -85,7 +85,7 @@ def redeem_key(request: http.HttpRequest) -> http.HttpResponse:
 
     request.user.redeemed_key = key
     request.user.account_type = "Premium"
-    request.user.hosting_credit += 31 * 24 * 60  # 1 month
+    request.user.hosting_credit += 5 * 24 * 60  # 1 month
     request.user.save()
 
     logs.create_entry(
