@@ -5,7 +5,7 @@ django-cors-headers
 pycryptodome
 user-agents
 paypal-checkout-serversdk
-googlesearch-python
+google-search
 python-dotenv
 django-dbbackup
 django-storages
