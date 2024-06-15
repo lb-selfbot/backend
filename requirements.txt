@@ -5,7 +5,7 @@ django-cors-headers
 pycryptodome
 user-agents
 paypal-checkout-serversdk
-googlesearch-python
+python-googlesearch
 python-dotenv
 django-dbbackup
 django-storages
@@ -13,13 +13,10 @@ psutil
 pillow==9.4.0
 mysqlclient
 bcrypt
-git+https://github.com/dolfies/discord.py-self
-janus
 pytesseract
 pyobf2
 selenium
 webdriver-manager
 django-ratelimit
-gradio-client @ git+https://github.com/gradio-app/gradio@main#subdirectory=client/python
 g4f
 func-timeout
