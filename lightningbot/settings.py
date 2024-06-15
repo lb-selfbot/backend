@@ -205,6 +205,7 @@ ALLOWED_HOSTS = [
     "hosting-api.lightning-bot.com",
     "lightning-bot.com",
     "localhost",
+    "127.0.0.1",
 ]
 
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
@@ -214,6 +215,7 @@ CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS = [
     "https://hosting-api.lightning-bot.com",
     "https://lightning-bot.com",
     "http://localhost:3000",
+    "http://127.0.0.1:8080",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
