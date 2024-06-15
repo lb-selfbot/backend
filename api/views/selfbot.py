@@ -3,11 +3,9 @@ Selfbot API views
 """
 
 import os
-import re
 import time
 import json
 import base64
-import asyncio
 import hashlib
 from datetime import datetime
 
@@ -20,7 +18,16 @@ from django import http
 from django_ratelimit.decorators import ratelimit
 
 
-from api.utils import keys, releases, logs, validation, obfuscation, misc, captcha
+from api.utils import (
+    keys,
+    releases,
+    logs,
+    validation,
+    obfuscation,
+    misc,
+    captcha,
+    hosting_api,
+)
 from api.utils.encryption import Encryption
 from api.models import User, CreditKey
 
@@ -249,31 +256,35 @@ def hosting_list_files(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
-    )
+    resp = hosting_api.list_files(str(user.id))
 
-    folder = os.path.join("/hosting", folder_name, "LightningBot")
+    return http.JsonResponse(resp)
 
-    if not os.path.exists(folder):
-        return http.JsonResponse(
-            {
-                "error": True,
-                "reason": "You must enable hosting at least once before you can list files.",
-            },
-            status=400,
-        )
+    # folder_name = (
+    #     misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    # )
 
-    content = {}
+    # folder = os.path.join("/hosting", folder_name, "LightningBot")
 
-    for root, subdirs, files in os.walk(folder):
-        root = root.replace(folder, "/").replace("\\", "/").replace("//", "/")
-        content[root] = {}
+    # if not os.path.exists(folder):
+    #     return http.JsonResponse(
+    #         {
+    #             "error": True,
+    #             "reason": "You must enable hosting at least once before you can list files.",
+    #         },
+    #         status=400,
+    #     )
 
-        content[root]["folders"] = subdirs.copy()
-        content[root]["files"] = files.copy()
+    # content = {}
 
-    return http.JsonResponse({"error": False, "content": content})
+    # for root, subdirs, files in os.walk(folder):
+    #     root = root.replace(folder, "/").replace("\\", "/").replace("//", "/")
+    #     content[root] = {}
+
+    #     content[root]["folders"] = subdirs.copy()
+    #     content[root]["files"] = files.copy()
+
+    # return http.JsonResponse({"error": False, "content": content})
 
 
 # POST /api/v3/selfbot/hosting/delete-folder
@@ -288,46 +299,50 @@ def hosting_delete_folder(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
-    )
+    resp = hosting_api.delete_folder(str(user.id), request.POST["folder_path"])
 
-    folder = os.path.join("/hosting", folder_name, "LightningBot")
+    return http.JsonResponse(resp)
 
-    if not os.path.exists(folder):
-        return http.JsonResponse(
-            {
-                "error": True,
-                "reason": "You must enable hosting at least once before you can delete files.",
-            },
-            status=400,
-        )
+    # folder_name = (
+    #     misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    # )
 
-    folder_path = misc.clean_filename(request.POST["folder_path"], is_folder=True)
+    # folder = os.path.join("/hosting", folder_name, "LightningBot")
 
-    while folder_path.startswith("/"):
-        folder_path = folder_path[1:]
+    # if not os.path.exists(folder):
+    #     return http.JsonResponse(
+    #         {
+    #             "error": True,
+    #             "reason": "You must enable hosting at least once before you can delete files.",
+    #         },
+    #         status=400,
+    #     )
 
-    requested_path = os.path.join(folder, folder_path)
+    # folder_path = misc.clean_filename(request.POST["folder_path"], is_folder=True)
 
-    if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
-        return http.JsonResponse(
-            {"error": True, "reason": "Invalid folder path."}, status=400
-        )
+    # while folder_path.startswith("/"):
+    #     folder_path = folder_path[1:]
 
-    if not os.path.exists(requested_path):
-        return http.JsonResponse(
-            {"error": True, "reason": "Folder does not exist."}, status=400
-        )
+    # requested_path = os.path.join(folder, folder_path)
 
-    if len(os.listdir(requested_path)) != 0:
-        return http.JsonResponse(
-            {"error": True, "reason": "Folder is not empty."}, status=400
-        )
+    # if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "Invalid folder path."}, status=400
+    #     )
 
-    os.rmdir(requested_path)
+    # if not os.path.exists(requested_path):
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "Folder does not exist."}, status=400
+    #     )
 
-    return http.JsonResponse({"error": False})
+    # if len(os.listdir(requested_path)) != 0:
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "Folder is not empty."}, status=400
+    #     )
+
+    # os.rmdir(requested_path)
+
+    # return http.JsonResponse({"error": False})
 
 
 # GET /api/v3/selfbot/hosting/download-file
@@ -342,50 +357,69 @@ def hosting_download_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
-    )
+    try:
+        response = hosting_api.download_file(
+            str(user.id), request.GET.get("file_path", "")
+        )
 
-    folder = os.path.join("/hosting", folder_name, "LightningBot")
+        response_headers = {
+            "Content-Type": response.headers["Content-Type"],
+            "Content-Disposition": response.headers["Content-Disposition"],
+        }
 
-    if not os.path.exists(folder):
+        return http.StreamingHttpResponse(
+            streaming_content=response.iter_content(chunk_size=8192),
+            headers=response_headers,
+        )
+    except Exception as e:
         return http.JsonResponse(
-            {
-                "error": True,
-                "reason": "You must enable hosting at least once before you can download files.",
-            },
-            status=400,
+            {"error": True, "reason": f"Error downloading file: {e}"}, status=500
         )
 
-    file_path = misc.clean_filename(request.GET.get("file_path", ""), is_folder=True)
-    if file_path == "":
-        return http.JsonResponse(
-            {"error": True, "reason": "Missing file path."}, status=400
-        )
+    # folder_name = (
+    #     misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    # )
 
-    while file_path.startswith("/"):
-        file_path = file_path[1:]
+    # folder = os.path.join("/hosting", folder_name, "LightningBot")
 
-    requested_path = os.path.join(folder, file_path)
+    # if not os.path.exists(folder):
+    #     return http.JsonResponse(
+    #         {
+    #             "error": True,
+    #             "reason": "You must enable hosting at least once before you can download files.",
+    #         },
+    #         status=400,
+    #     )
 
-    if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
-        return http.JsonResponse(
-            {"error": True, "reason": "Invalid file path."}, status=400
-        )
+    # file_path = misc.clean_filename(request.GET.get("file_path", ""), is_folder=True)
+    # if file_path == "":
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "Missing file path."}, status=400
+    #     )
 
-    if not os.path.exists(os.path.join(folder, file_path)):
-        return http.JsonResponse(
-            {"error": True, "reason": "File does not exist."}, status=400
-        )
+    # while file_path.startswith("/"):
+    #     file_path = file_path[1:]
 
-    with open(os.path.join(folder, file_path), "rb") as f:
-        return http.HttpResponse(
-            f.read(),
-            content_type="application/octet-stream",
-            headers={
-                "Content-Disposition": f"attachment; filename={file_path.split('/')[-1]}"
-            },
-        )
+    # requested_path = os.path.join(folder, file_path)
+
+    # if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "Invalid file path."}, status=400
+    #     )
+
+    # if not os.path.exists(os.path.join(folder, file_path)):
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "File does not exist."}, status=400
+    #     )
+
+    # with open(os.path.join(folder, file_path), "rb") as f:
+    #     return http.HttpResponse(
+    #         f.read(),
+    #         content_type="application/octet-stream",
+    #         headers={
+    #             "Content-Disposition": f"attachment; filename={file_path.split('/')[-1]}"
+    #         },
+    #     )
 
 
 # POST /api/v3/selfbot/hosting/delete-file
@@ -400,41 +434,45 @@ def hosting_delete_file(request: http.HttpRequest) -> http.HttpResponse:
             status=400,
         )
 
-    folder_name = (
-        misc.clean_filename(request.user.username) + "-" + str(request.user.id)
-    )
+    resp = hosting_api.delete_file(str(user.id), request.POST["file_path"])
 
-    folder = os.path.join("/hosting", folder_name, "LightningBot")
+    return http.JsonResponse(resp)
 
-    if not os.path.exists(folder):
-        return http.JsonResponse(
-            {
-                "error": True,
-                "reason": "You must enable hosting at least once before you can delete files.",
-            },
-            status=400,
-        )
+    # folder_name = (
+    #     misc.clean_filename(request.user.username) + "-" + str(request.user.id)
+    # )
 
-    file_path = misc.clean_filename(request.POST["file_path"], is_folder=True)
+    # folder = os.path.join("/hosting", folder_name, "LightningBot")
 
-    while file_path.startswith("/"):
-        file_path = file_path[1:]
+    # if not os.path.exists(folder):
+    #     return http.JsonResponse(
+    #         {
+    #             "error": True,
+    #             "reason": "You must enable hosting at least once before you can delete files.",
+    #         },
+    #         status=400,
+    #     )
 
-    requested_path = os.path.join(folder, file_path)
+    # file_path = misc.clean_filename(request.POST["file_path"], is_folder=True)
 
-    if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
-        return http.JsonResponse(
-            {"error": True, "reason": "Invalid file path."}, status=400
-        )
+    # while file_path.startswith("/"):
+    #     file_path = file_path[1:]
 
-    if not os.path.exists(requested_path):
-        return http.JsonResponse(
-            {"error": True, "reason": "File does not exist."}, status=400
-        )
+    # requested_path = os.path.join(folder, file_path)
 
-    os.remove(requested_path)
+    # if os.path.commonprefix((os.path.realpath(requested_path), folder)) != folder:
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "Invalid file path."}, status=400
+    #     )
 
-    return http.JsonResponse({"error": False})
+    # if not os.path.exists(requested_path):
+    #     return http.JsonResponse(
+    #         {"error": True, "reason": "File does not exist."}, status=400
+    #     )
+
+    # os.remove(requested_path)
+
+    # return http.JsonResponse({"error": False})
 
 
 # POST /api/v3/selfbot/start-params
@@ -629,6 +667,7 @@ def poketwo_verify(request: http.HttpRequest) -> http.HttpResponse:
         return http.JsonResponse({"error": False, "task_id": task_id})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
 
 # POST /api/v3/selfbot/poketwo-status
 @ratelimit(key="ip", rate="1/s", method=ratelimit.ALL, block=True)
