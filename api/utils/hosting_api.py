@@ -80,7 +80,7 @@ def delete_file(user_id: str, file_path: str) -> dict:
     """
     try:
         response = requests.post(
-            os.environ.get("HOSTING_API_URL") + "/api/v1/delete-folder",
+            os.environ.get("HOSTING_API_URL") + "/api/v1/delete-file",
             headers={
                 "Authorization": os.environ.get("HOSTING_API_KEY"),
                 "User-Id": user_id,
@@ -101,7 +101,7 @@ def download_file(user_id: str, file_path: str) -> requests.Response:
     Delete a file
     """
     response = requests.get(
-        os.environ.get("HOSTING_API_URL") + "/api/v1/delete-folder",
+        os.environ.get("HOSTING_API_URL") + "/api/v1/download-file",
         headers={
             "Authorization": os.environ.get("HOSTING_API_KEY"),
             "User-Id": user_id,
