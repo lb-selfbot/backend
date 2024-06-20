@@ -126,6 +126,7 @@ def redeem_credit_key(request: http.HttpRequest) -> http.HttpResponse:
 
     promotion_keys = [
         ("LB-DOWNTIME-16-01-2024", datetime(2024, 2, 1, 0, 0, 0), 31 * 24 * 60),
+        ("LB-DOWNTIME-2024-06-18", datetime(2024, 7, 1, 0, 0, 0), 31 * 24 * 60),
     ]
 
     for pkey, date, amount in promotion_keys:
