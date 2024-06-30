@@ -643,6 +643,9 @@ def gpt(request: http.HttpRequest) -> http.HttpResponse:
         del data["username"]
         del data["password"]
 
+        data["model"] = "deepseek-chat"
+        data["stream"] = False
+
         resp = requests.post(
             "https://api.deepseek.com/chat/completions",
             json=data,
