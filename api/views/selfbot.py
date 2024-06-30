@@ -643,7 +643,18 @@ def gpt(request: http.HttpRequest) -> http.HttpResponse:
         del data["username"]
         del data["password"]
 
-        response = g4f.ChatCompletion.create(**data)
+        resp = requests.post(
+            "https://api.deepseek.com/chat/completions",
+            json=data,
+            headers={
+                "Authorization": f"Bearer {os.getenv('DEEPSEEK_API_KEY')}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            timeout=30,
+        )
+        
+        response = resp.json()["choices"][0]["message"]["content"]
 
         return http.JsonResponse({"error": False, "response": response})
     except Exception as e:
