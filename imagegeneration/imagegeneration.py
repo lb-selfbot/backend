@@ -281,7 +281,7 @@ class AlexFlipNote:
         offset = 25
         for line in textwrap.wrap(f"The floor is {text}", width=65):
             draw.text((margin, offset), line, font=fnt, fill=(0,) * 3)
-            offset += fnt.getsize(line)[1]
+            offset += fnt.getbbox(line)[2:][1]
         if image:
             try:
                 icon = io.BytesIO(requests.get(image, timeout=10).content)
@@ -546,7 +546,7 @@ class AlexFlipNote:
         y_text = background.size[1] / 2
         w = background.size[0]
         for line in lines:
-            width, height = font.getsize(line)
+            width, height = font.getbbox(line)[2:]
             draw.text(
                 ((w - width) / 2, y_text), line, font=font, fill=(255, 255, 255, 255)
             )
@@ -581,13 +581,13 @@ class AlexFlipNote:
         font_med = PIL.ImageFont.truetype("assets/_fonts/gg_sans_medium.ttf", 35)
 
         bg_w = max(
-            max(200 + font.getsize(lines[0])[0], 300),  # Text
+            max(200 + font.getbbox(lines[0])[2:][0], 300),  # Text
             max(
-                200 + font_med.getsize(author)[0] + 15 + font_s.getsize(timestamp)[0],
+                200 + font_med.getbbox(author)[2:][0] + 15 + font_s.getbbox(timestamp)[2:][0],
                 300,
             ),  # Author + Timestamp
         )
-        bg_h = 100 + font.getsize(lines[0])[1] * len(lines)
+        bg_h = 100 + font.getbbox(lines[0])[2:][1] * len(lines)
 
         background = PIL.Image.new("RGBA", (bg_w, bg_h), (49, 51, 56, 255))
 
@@ -616,8 +616,8 @@ class AlexFlipNote:
         # Draw timestamp
         draw.text(
             (
-                140 + font_med.getsize(author)[0] + 15,
-                25 + font_med.getsize("a")[1] - font_s.getsize("a")[1],
+                140 + font_med.getbbox(author)[2:][0] + 15,
+                25 + font_med.getbbox("a")[2:][1] - font_s.getbbox("a")[2:][1],
             ),
             timestamp,
             font=font_s,
@@ -627,7 +627,7 @@ class AlexFlipNote:
         # Draw text
         text_x, text_y = 140, 72
         for line in lines:
-            width, height = font.getsize(line)
+            width, height = font.getbbox(line)[2:]
             draw.text((text_x, text_y), line, font=font, fill=(255, 255, 255, 255))
             text_y += height
 
