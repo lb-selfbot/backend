@@ -524,7 +524,7 @@ class AlexFlipNote:
 
     def quote(self, author: str, text: str, background_url: str) -> PIL.Image.Image:
         if background_url == "":
-            background_url = "https://source.unsplash.com/random/1920x1080"
+            background_url = "https://picsum.photos/1920/1080"
 
         try:
             background = PIL.Image.open(
