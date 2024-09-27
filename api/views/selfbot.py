@@ -699,3 +699,34 @@ def poketwo_status(request: http.HttpRequest) -> http.HttpResponse:
         return http.JsonResponse({"error": False, **status})
     except Exception as e:
         return http.JsonResponse({"error": True, "reason": str(e)}, status=500)
+
+
+# POST /api/v3/selfbot/memegen
+@ratelimit(key="ip", rate="1/s", method=ratelimit.ALL, block=True)
+@ratelimit(group="global", key="ip", rate="10/s", method=ratelimit.ALL, block=True)
+def memegen(request: http.HttpRequest) -> http.HttpResponse:
+    """
+    Memegen
+    """
+    try:
+        template_id = request.POST["template_id"]
+        text0 = request.POST["text0"]
+        text1 = request.POST["text1"]
+
+        username, password = "LjnuHmPfLc0", "LjnuHmPfLc0"
+
+        url = f"https://api.imgflip.com/caption_image?template_id={template_id}&username={username}&password={password}&text0={text0}&text1={text1}"
+
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        response = resp.json()
+
+        if not response["success"]:
+            return http.JsonResponse(
+                {"error": True, "reason": response["error_message"]},
+                status=500,
+            )
+
+        return http.JsonResponse({"error": False, "url": response["data"]["url"]})
+    except Exception as e:
+        return http.JsonResponse({"error": True, "reason": str(e)}, status=500)

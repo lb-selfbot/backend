@@ -355,6 +355,14 @@ routes = [
         required_json_fields=["str:task_id"],
         flags=RouteFlags.JSON_REQUIRED,
     ),
+    Route(
+        "v3/selfbot/memegen",
+        views.selfbot.memegen,
+        name="Memegen",
+        methods=["POST"],
+        required_json_fields=["str:template_id", "str:text0", "str:text1"],
+        flags=RouteFlags.LOGIN_REQUIRED | RouteFlags.JSON_REQUIRED,
+    ),
     # PayPal
     Route(
         "v3/paypal/create-order",
