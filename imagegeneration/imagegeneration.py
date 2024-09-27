@@ -203,7 +203,7 @@ class AlexFlipNote:
             face = face.resize(
                 (face.size[0] // 10, face.size[1] // 10), PIL.Image.BICUBIC
             )
-            face = face.resize(face.size, PIL.Image.ANTIALIAS)
+            face = face.resize(face.size, PIL.Image.LANCZOS)
         elif filter_type == "jpegify":
             final = io.BytesIO()
             face.convert("RGB").save(final, "JPEG", quality=random.randint(1, 10))
@@ -566,7 +566,7 @@ class AlexFlipNote:
         bigsize = (im.size[0] * 3, im.size[1] * 3)
         mask = PIL.Image.new("L", bigsize, 0)
         PIL.ImageDraw.Draw(mask).ellipse((0, 0) + bigsize, fill=255)
-        mask = mask.resize(im.size, PIL.Image.ANTIALIAS)
+        mask = mask.resize(im.size, PIL.Image.LANCZOS)
         mask = PIL.ImageChops.darker(mask, im.split()[-1])
         im.putalpha(mask)
 
