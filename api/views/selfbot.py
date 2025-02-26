@@ -644,6 +644,7 @@ def gpt(request: http.HttpRequest) -> http.HttpResponse:
         del data["password"]
 
         data["model"] = "deepseek-chat"
+        data["max_tokens"] = 1024
         data["stream"] = False
 
         resp = requests.post(
